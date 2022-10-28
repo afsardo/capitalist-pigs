@@ -1,14 +1,14 @@
 import React from "react";
 
-const Lab = () => {
+const Dashboard = () => {
   return (
     <div>
       <h3 className="text-purple-700 tracking-wider text-2xl uppercase">
-        Laboratory
+        Dashboard
       </h3>
-      <img src="/lab.jpeg" alt="lab" />
+      <img src="/pig.jpeg" alt="pig" />
     </div>
   );
 };
 
-export default Lab;
+export default Dashboard;

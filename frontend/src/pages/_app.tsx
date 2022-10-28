@@ -1,6 +1,7 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import Link from "next/link";
+
+import Navbar from "src/components/Navbar";
 
 import "../styles/globals.css";
 
@@ -15,19 +16,11 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div>
-        <ul>
-          <li>
-            <Link href="frontpage">Frontpage</Link>
-          </li>
-          <li>
-            <Link href="lab">Laboratory</Link>
-          </li>
-          <li>
-            <Link href="coop">Co-op</Link>
-          </li>
-        </ul>
-        <Component {...pageProps} />
+      <div className="min-h-screen bg-black text-[#F1F7ED]">
+        <Navbar />
+        <div className="max-w-5xl w-full mx-auto">
+          <Component {...pageProps} />
+        </div>
       </div>
     </>
   );
