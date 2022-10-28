@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const Dashboard = () => {
   return (
@@ -6,7 +7,7 @@ const Dashboard = () => {
       <h3 className="text-purple-700 tracking-wider text-2xl uppercase">
         Dashboard
       </h3>
-      <img src="/pig.jpeg" alt="pig" />
+      <Image src="/pig.jpeg" alt="pig" />
     </div>
   );
 };
