@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>CapitalistPigs</title>
+        <title>Capitalist Pigs</title>
         <meta
           name="description"
           content="CapitalistPigs built by Degens, BlazinglyFast™"
@@ -18,7 +18,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <div className="min-h-screen bg-black text-[#F1F7ED]">
         <Navbar />
-        <div className="max-w-5xl w-full mx-auto">
+        <div className="max-w-5xl w-full mx-auto py-4">
           <Component {...pageProps} />
         </div>
       </div>

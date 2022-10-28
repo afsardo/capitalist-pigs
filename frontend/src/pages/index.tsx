@@ -1,5 +1,7 @@
 import dynamic from "next/dynamic";
 
+import Heading from "src/components/Heading";
+
 const Counter = dynamic(() => import("../components/Counter"), {
   ssr: false,
 });
@@ -7,9 +9,7 @@ const Counter = dynamic(() => import("../components/Counter"), {
 export default function Home() {
   return (
     <div>
-      <header>
-        <h1>CapitalistPigs</h1>
-      </header>
+      <Heading className="mb-5">Capitalist Pigs</Heading>
 
       <main>
         <Counter />

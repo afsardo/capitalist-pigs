@@ -1,13 +1,22 @@
 import React from "react";
 import Image from "next/image";
 
+import Heading from "src/components/Heading";
+
 const Dashboard = () => {
   return (
     <div>
-      <h3 className="text-purple-700 tracking-wider text-2xl uppercase">
-        Dashboard
-      </h3>
-      <Image src="/pig.jpeg" alt="pig" width={400} height={400} />
+      <Heading className="mb-5">Dashboard</Heading>
+
+      <div className="flex gap-4">
+        <Image src="/pig.jpeg" alt="lab" width={300} height={300} />
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit,
+          magni! Quae, excepturi. Harum, error culpa? Beatae aliquid ipsum
+          recusandae provident minus. Nulla amet aut, earum sapiente
+          consequuntur perspiciatis veniam ab.
+        </p>
+      </div>
     </div>
   );
 };
