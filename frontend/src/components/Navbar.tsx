@@ -5,6 +5,11 @@ const Navbar = () => {
   return (
     <ul className="flex justify-center gap-5 py-4 px-4">
       <li>
+        <Link className="hover:text-yellow-200" href="/">
+          Home
+        </Link>
+      </li>
+      <li>
         <Link className="hover:text-yellow-200" href="dashboard">
           Dashboard
         </Link>
