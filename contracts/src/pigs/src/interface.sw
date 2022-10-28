@@ -5,44 +5,6 @@ dep data_structures;
 use data_structures::TokenMetaData;
 use std::{identity::Identity, option::Option};
 
-pub struct AdminEvent {
-    /// The user which is now the admin of this contract.
-    /// If there is no longer an admin then the `Option` will be `None`.
-    admin: Option<Identity>,
-}
-
-pub struct PigletTransformerEvent {
-    /// The user which is now the piglet transformer of this contract.
-    /// If there is no longer a piglet transformer, then the `Option` will be `None`.
-    piglet_transformer: Option<ContractId>,
-}
-
-pub struct ApprovalEvent {
-    /// The user that has gotten approval to transfer the specified token.
-    /// If an approval was revoked, the `Option` will be `None`.
-    approved: Option<Identity>,
-    /// The user that has given or revoked approval to transfer his/her tokens.
-    owner: Identity,
-    /// The unique identifier of the token which the approved may transfer.
-    token_id: u64,
-}
-
-pub struct BurnEvent {
-    /// The user that has burned their token.
-    owner: Identity,
-    /// The unique identifier of the token which has been burned.
-    token_id: u64,
-}
-
-pub struct MintEvent {
-    /// The owner of the newly minted tokens.
-    owner: Identity,
-    /// The starting range of token ids that have been minted in this transaction.
-    token_id_start: u64,
-    /// The total number of tokens minted in this transaction.
-    total_tokens: u64,
-}
-
 abi NFT {
     /// Returns the current admin for the contract.
     ///
@@ -58,7 +20,7 @@ abi NFT {
     ///
     /// * When the contract does not have a piglet transformer.
     #[storage(read)]
-    fn piglet_transformer() -> ContractId;
+    fn piglet_transformer() -> Identity;
 
     /// Gives approval to the `approved` user to transfer a specific token on another user's behalf.
     ///
@@ -123,7 +85,11 @@ abi NFT {
     ///
     /// * `access_control` - Determines whether only the admin can call the mint function.
     /// * `admin` - The user which has the ability to mint if `access_control` is set to true and change the contract's admin.
+    /// * `piglet_transformer` - The contract that has the ability to mint new pig NFTs if the `admin` is null.
     /// * `max_supply` - The maximum supply of tokens that can ever be minted.
+    /// * `inflation_start_time` - The timestamp when inflation starts.
+    /// * `inflation_rate` - The inflation rate allowed every epoch.
+    /// * `inflation_epoch` - The epoch during which `inflation_rate` inflation is allowed.
     ///
     /// # Reverts
     ///
@@ -131,7 +97,11 @@ abi NFT {
     /// * When the `token_supply` is set to 0.
     /// * When `access_control` is set to true and no admin `Identity` was given.
     #[storage(read, write)]
-    fn constructor(access_control: bool, admin: Identity, max_supply: u64);
+    fn constructor(access_control: bool, admin: Identity, piglet_transformer: Identity, max_supply: u64, inflation_start_time: u64, inflation_rate: u64, inflation_epoch: u64);
+
+    /// Snapshots the `total_supply` so that inflation can start.
+    #[storage(read, write)]
+    fn snapshot_supply();
 
     /// Returns whether the `operator` user is approved to transfer all tokens on the `owner`
     /// user's behalf.
