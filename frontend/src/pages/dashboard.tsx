@@ -7,7 +7,7 @@ const Dashboard = () => {
       <h3 className="text-purple-700 tracking-wider text-2xl uppercase">
         Dashboard
       </h3>
-      <Image src="/pig.jpeg" alt="pig" />
+      <Image src="/pig.jpeg" alt="pig" width={400} height={400} />
     </div>
   );
 };

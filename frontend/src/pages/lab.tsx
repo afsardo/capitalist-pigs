@@ -7,7 +7,7 @@ const Lab = () => {
       <h3 className="text-purple-700 tracking-wider text-2xl uppercase">
         Laboratory
       </h3>
-      <Image src="/lab.jpeg" alt="lab" />
+      <Image src="/lab.jpeg" alt="lab" width={400} height={400} />
     </div>
   );
 };
