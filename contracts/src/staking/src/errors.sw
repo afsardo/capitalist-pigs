@@ -15,10 +15,12 @@ pub enum InputError {
     CannotAssingToThisContract: (),
     IndexExceedsArrayLength: (),
     PigletAlreadyDelegated: (),
+    PigProvidedNotStaked: (),
     NullArray: (),
     InvalidPig: ()
 }
 
-pub enum AccessControlError [
-    CallerNotPigletOwner: ()
-]
+pub enum AccessControlError {
+    CallerNotPigletOwner: (),
+    CallerNotPigletContract: ()
+}
