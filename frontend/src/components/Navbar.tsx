@@ -51,7 +51,7 @@ export default function Example() {
   };
 
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure as="nav" className="fixed w-full h-[60px] bg-transparent backdrop-blur-sm border-b border-white/10 z-30">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
