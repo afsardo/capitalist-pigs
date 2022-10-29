@@ -1,4 +1,4 @@
-library data_structures;
+library interface;
 
 use std::{address::Address, contract_id::ContractId, token::*};
 

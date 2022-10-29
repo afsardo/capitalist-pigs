@@ -4,7 +4,7 @@ dep errors;
 dep interface;
 
 use errors::Error;
-use interface::Truffles;
+use interface::Bacon;
 
 use std::{
     address::*,
@@ -21,17 +21,15 @@ use std::{
 };
 
 storage {
-    owner: Address = Address {
-        value: ZERO_B256
-    },
     mint_amount: u64 = 0,
+    owner: Address = Address { value: ZERO_B256 },
     mint_list: StorageMap<Address, bool> = StorageMap {},
 }
 
 /////////////////
 // Access Control
 /////////////////
-/// Return the sender as an address or panic
+/// Return the sender as an Address or panic
 fn get_msg_sender_address_or_panic() -> Address {
     let sender: Result<Identity, AuthError> = msg_sender();
     if let Identity::Address(address) = sender.unwrap() {
@@ -47,7 +45,7 @@ fn validate_owner() {
     require(storage.owner == sender, Error::NotOwner);
 }
 
-impl Truffles for Contract {
+impl Bacon for Contract {
     ////////////////
     // Owner Methods
     ////////////////
