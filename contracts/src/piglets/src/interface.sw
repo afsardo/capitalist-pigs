@@ -54,6 +54,14 @@ abi PigletNFT {
     #[storage(read)]
     fn balance_of(owner: Identity) -> u64;
 
+    /// Claim all available rewards to the `owner` user.
+    ///
+    /// # Arguments
+    ///
+    /// * `owner` - The user of which the balance should be returned.
+    #[storage(read, write)]
+    fn claim_rewards();
+
     /// Burns the specified token.
     ///
     /// When burned, the metadata of the token is removed. After the token has been burned, no one
@@ -78,7 +86,7 @@ abi PigletNFT {
     ///
     /// * `access_control` - Determines whether only the admin can call the mint function.
     /// * `admin` - The user which has the ability to mint if `access_control` is set to true and change the contract's admin.
-    /// * `trufflers_minter` - The contract that has the ability to mint new piglet NFTs if the `admin` is null.
+    /// * `piglet_minter` - The contract that has the ability to mint new piglet NFTs if the `admin` is null.
     /// * `max_supply` - The maximum supply of tokens that can ever be minted.
     ///
     /// # Reverts
@@ -87,17 +95,34 @@ abi PigletNFT {
     /// * When the `token_supply` is set to 0.
     /// * When `access_control` is set to true and no admin `Identity` was given.
     #[storage(read, write)]
-    fn constructor(access_control: bool, admin: Identity, trufflers_minter: Identity, max_supply: u64);
+    fn constructor(access_control: bool, admin: Identity, piglet_minter: Identity, max_supply: u64);
 
-    /// Returns whether the `operator` user is approved to transfer all tokens on the `owner`
-    /// user's behalf.
+    /// Delegate the piglets of sender to a pig
     ///
     /// # Arguments
     ///
     /// * `pig` - The pig NFT where the Piglets will be delegated to
     /// * `piglets` - The Piglets which will be delegated
+    ///
+    /// # Reverts
+    ///
+    /// * When pig is not staked
+    /// * When piglets are not owned by sender
     #[storage(read, write)]
     fn delegate(pig: u64, piglets: [u64]);
+
+    /// Removes the piglets from being delegated
+    ///
+    /// # Arguments
+    ///
+    /// * `piglets` - The Piglets which will be delegated
+    ///
+    /// # Reverts
+    ///
+    /// * When piglets are not delegated
+    /// * When piglets are not owned by sender
+    #[storage(read, write)]
+    fn remove_delegation(piglets: [u64]);
 
     /// Returns whether the `operator` user is approved to transfer all tokens on the `owner`
     /// user's behalf.
@@ -189,13 +214,13 @@ abi PigletNFT {
     ///
     /// # Arguments
     ///
-    /// * `trufflers_minter` - The user which can transform trufflers currency into piglet NFTs.
+    /// * `piglet_minter` - The user which can transform trufflers currency into piglet NFTs.
     ///
     /// # Reverts
     ///
-    /// * When the sender is not the `admin` or the current `trufflers_minter` in storage.
+    /// * When the sender is not the `admin` or the current `piglet_minter` in storage.
     #[storage(read, write)]
-    fn set_trufflers_minter(trufflers_minter: Identity);
+    fn set_piglet_minter(piglet_minter: Identity);
 
     /// Gives the `operator` user approval to transfer ALL tokens owned by the `owner` user.
     ///
@@ -236,11 +261,11 @@ abi PigletNFT {
     fn transfer_from(from: Identity, to: Identity, token_id: u64);
 
     
-    /// Returns the current trufflers minter for the contract.
+    /// Returns the current piglet minter for the contract.
     ///
     /// # Reverts
     ///
-    /// * When the contract does not have a trufflers minter.
+    /// * When the contract does not have a piglet minter.
     #[storage(read)]
-    fn trufflers_minter() -> Identity;
+    fn piglet_minter() -> Identity;
 }
