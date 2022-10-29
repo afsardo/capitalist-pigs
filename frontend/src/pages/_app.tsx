@@ -16,11 +16,14 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="min-h-screen bg-black text-[#F1F7ED]">
+      <div className="min-h-screen bg-black text-[#F1F7ED] flex flex-col">
         <Navbar />
-        <div className="max-w-5xl w-full mx-auto py-4">
+        <div className="max-w-5xl w-full mx-auto py-4 flex-1">
           <Component {...pageProps} />
         </div>
+        <footer className="py-4 px-6 text-white/60">
+          © 2022 Powered by Degens, BlazinglyFast™
+        </footer>
       </div>
     </>
   );

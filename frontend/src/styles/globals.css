@@ -22,3 +22,15 @@
   filter: blur(0);
   transform: translateX(0);
 }
+
+.logo-container:nth-child(2) {
+  @apply delay-200;
+}
+
+.logo-container:nth-child(3) {
+  @apply delay-500;
+}
+
+.logo-container:nth-child(4) {
+  @apply delay-1000;
+}
