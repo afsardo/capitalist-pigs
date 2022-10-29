@@ -1,14 +1,16 @@
 library interface;
-
 dep data_structures;
-
 use data_structures::TokenMetaData;
+<<<<<<< Updated upstream
 use std::{
     identity::Identity,
     contract_id::ContractId,
     vec::Vec
 };
 
+=======
+use std::{contract_id::ContractId, identity::Identity, vec::Vec};
+>>>>>>> Stashed changes
 abi PigletNFT {
     /// Returns the current admin for the contract.
     ///
@@ -17,7 +19,10 @@ abi PigletNFT {
     /// * When the contract does not have an admin.
     #[storage(read)]
     fn admin() -> Identity;
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     /// Gives approval to the `approved` user to transfer a specific token on another user's behalf.
     ///
     /// To revoke approval the approved user should be `None`.
@@ -33,7 +38,6 @@ abi PigletNFT {
     /// * When the sender is not the token's owner.
     #[storage(read, write)]
     fn approve(approved: Identity, token_id: u64);
-
     /// Returns the user which is approved to transfer the given token.
     ///
     /// If there is no approved user or the unique identifier does not map to an existing token,
@@ -48,7 +52,6 @@ abi PigletNFT {
     /// * When there is no approved for the `token_id`.
     #[storage(read)]
     fn approved(token_id: u64) -> Identity;
-
     /// Returns the balance of the `owner` user.
     ///
     /// # Arguments
@@ -56,7 +59,6 @@ abi PigletNFT {
     /// * `owner` - The user of which the balance should be returned.
     #[storage(read)]
     fn balance_of(owner: Identity) -> u64;
-
     /// Burns the specified token.
     ///
     /// When burned, the metadata of the token is removed. After the token has been burned, no one
@@ -72,7 +74,6 @@ abi PigletNFT {
     /// * When sender is not the owner of the token.
     #[storage(read, write)]
     fn burn(token_id: u64);
-
     /// Sets the inital state and unlocks the functionality for the rest of the contract.
     ///
     /// This function can only be called once.
@@ -88,7 +89,6 @@ abi PigletNFT {
     /// * When the `token_supply` is set to 0.
     #[storage(read, write)]
     fn constructor(factory: ContractId, admin: Identity, piglet_minter: Identity);
-
     /// Delegate the piglets of sender to a pig
     ///
     /// # Arguments
@@ -101,8 +101,7 @@ abi PigletNFT {
     /// * When pig is not staked
     /// * When piglets are not owned by sender
     #[storage(read, write)]
-    fn delegate(pig: u64, piglets: [u64]);
-
+    fn delegate(pig: u64, piglets: Vec<u64>);
     /// Removes the piglets delegation from pig
     ///
     /// # Arguments
@@ -115,8 +114,7 @@ abi PigletNFT {
     /// * When pig is not staked
     /// * When Staking contract fails
     #[storage(read, write)]
-    fn remove_delegation(pig: u64, piglets: [u64]);
-
+    fn remove_delegation(pig: u64, piglets: Vec<u64>);
     /// Returns whether the `operator` user is approved to transfer all tokens on the `owner`
     /// user's behalf.
     ///
@@ -126,7 +124,6 @@ abi PigletNFT {
     /// * `owner` - The user which has given approval to transfer all tokens to the `operator`.
     #[storage(read)]
     fn is_approved_for_all(operator: Identity, owner: Identity) -> bool;
-
     /// Mints `amount` number of tokens to the `to` `Identity`.
     ///
     /// Once a token has been minted, it can be transfered and burned.
@@ -141,7 +138,6 @@ abi PigletNFT {
     /// * When the minter is is not the trufflers Identity.
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity);
-
     /// Mints Pigs based on the amount of piglets given
     /// Once a Pig token has been minted, it gets transfered to the sender and piglets get burned
     ///
@@ -156,8 +152,7 @@ abi PigletNFT {
     /// * When the minter does not have enough Piglets to mint at least 1 Pig
     /// * When the Pig Contract fails
     #[storage(read, write)]
-    fn mintPigs(piglets: [u64]);
-
+    fn mintPigs(piglets: Vec<u64>);
     /// Returns the metadata for the token specified
     ///
     /// # Arguments
@@ -169,7 +164,6 @@ abi PigletNFT {
     /// * When the `token_id` does not map to an exsiting token.
     #[storage(read)]
     fn meta_data(token_id: u64) -> TokenMetaData;
-
     /// Returns the user which owns the specified token.
     ///
     /// # Arguments
@@ -185,7 +179,10 @@ abi PigletNFT {
     // Return the piglets_to_pigs_ratio
     #[storage(read)]
     fn piglets_to_pigs_ratio() -> u64;
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     /// Returns the whole array of piglets that a user holds.
     ///
     /// # Arguments
@@ -193,15 +190,20 @@ abi PigletNFT {
     /// * `owner` - The owner for which we return the whole array of piglets they currently hold
     #[storage(read)]
     fn piglets(owner: Identity) -> Vec<u64>;
+<<<<<<< Updated upstream
 
     /// Returns the factory contract.
     #[storage(read)]
     fn get_factory() -> ContractId;
 
+=======
+    /// Returns the factory contract.
+    #[storage(read)]
+    fn get_factory() -> ContractId;
+>>>>>>> Stashed changes
     /// Returns the piglet minter for the contract.
     #[storage(read)]
     fn piglet_minter() -> Identity;
-
     /// Changes the contract's admin.
     ///
     /// # Arguments
@@ -213,7 +215,6 @@ abi PigletNFT {
     /// * When the sender is not the `admin` in storage.
     #[storage(read, write)]
     fn set_admin(admin: Identity);
-
     /// Changes the contract's piglet minter.
     ///
     /// This new piglet minter will have access to minting if `admin` is null.
@@ -227,7 +228,6 @@ abi PigletNFT {
     /// * When the sender is not the `admin` or the current `piglet_minter` in storage.
     #[storage(read, write)]
     fn set_piglet_minter(piglet_minter: Identity);
-
     /// Gives the `operator` user approval to transfer ALL tokens owned by the `owner` user.
     ///
     /// This can be dangerous. If a malicous user is set as an operator to another user, they could
@@ -239,11 +239,9 @@ abi PigletNFT {
     /// * `operator` - The user which may transfer all tokens on the owner's behalf.
     #[storage(read, write)]
     fn set_approval_for_all(approve: bool, operator: Identity);
-
     /// Returns the total supply of tokens which are currently in existence.
     #[storage(read)]
     fn total_supply() -> u64;
-
     /// Transfers ownership of the specified token from one user to another.
     ///
     /// Transfers can occur under one of three conditions:
