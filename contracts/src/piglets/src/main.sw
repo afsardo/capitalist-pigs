@@ -89,7 +89,6 @@ fn validate_if_piglets_belong_to_sender(owner: Identity, piglets: Vec<u64>) {
     }
 }
 
-///
 impl PigletNFT for Contract {
     #[storage(read, write)]
     fn constructor(
