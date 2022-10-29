@@ -3,6 +3,7 @@ library errors;
 pub enum InitError {
     CannotReinitialize: (),
     PigsIsNone: (),
+    PigletsIsNone: (),
     FeeTokenIsNone: (),
     FeeDistributorIsNone: (),
     TrufflesIsNone: (),
@@ -11,5 +12,13 @@ pub enum InitError {
 }
 
 pub enum InputError {
-    IndexExceedsArrayLength: ()
+    CannotAssingToThisContract: (),
+    IndexExceedsArrayLength: (),
+    PigletAlreadyDelegated: (),
+    NullArray: (),
+    InvalidPig: ()
 }
+
+pub enum AccessControlError [
+    CallerNotPigletOwner: ()
+]

@@ -105,6 +105,8 @@ fn remove_pig(owner: Identity, pig: u64) {
             storage.pigs.get(owner).remove(i);
             break;
         }
+
+        i += 1;
     }
 }
 
@@ -228,11 +230,6 @@ impl Pigs for Contract {
     }
 
     #[storage(read, write)]
-    fn gg(puta_madre: Identity) -> u64 {
-        return 1
-    }
-
-    #[storage(read, write)]
     fn mint(amount: u64, to: Identity) {
         let tokens_minted = storage.tokens_minted;
         let total_mint = tokens_minted + amount;
@@ -258,7 +255,7 @@ impl Pigs for Contract {
 
         // Mint as many tokens as the sender has asked for
         let mut index = tokens_minted;
-        while index < total_mint {
+        while (index < total_mint) {
             // Create the TokenMetaData for this new token
             storage.meta_data.insert(index, ~TokenMetaData::new());
             storage.owners.insert(index, Option::Some(to));

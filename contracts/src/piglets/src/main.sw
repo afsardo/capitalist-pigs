@@ -65,6 +65,8 @@ fn remove_piglet_from_owner_map(owner: Identity, piglet_id: u64) {
             storage.balances.insert(owner, storage.balances.get(owner) - 1);
             break;
         }
+
+        i += 1;
     }
 }
 
@@ -231,9 +233,9 @@ impl PigletNFT for Contract {
     #[storage(read, write)]
     fn delegate(pig: u64, piglets: Vec<u64>) {
         let sender = msg_sender().unwrap();
-        
+
         validate_if_piglets_belong_to_sender(sender, piglets);
-        
+
         let staking_id: b256 = storage.factory.into();
         let staking_contract = abi(StakingABI, staking_id);
         staking_contract.delegate(sender, pig, piglets);
@@ -242,9 +244,9 @@ impl PigletNFT for Contract {
     #[storage(read, write)]
     fn remove_delegation(pig: u64, piglets: Vec<u64>) {
         let sender = msg_sender().unwrap();
-        
+
         validate_if_piglets_belong_to_sender(sender, piglets);
-        
+
         let staking_id: b256 = storage.factory.into();
         let staking_contract = abi(StakingABI, staking_id);
         staking_contract.undelegate(sender, pig, piglets);
@@ -275,7 +277,7 @@ impl PigletNFT for Contract {
         // validate pigslets len > 1
         require(piglets.len() > 0, InputError::InvalidTokenSize);
 
-        // validate if piglets >= piglets_to_pig_conversation 
+        // validate if piglets >= piglets_to_pig_conversation
         require(piglets.len() > storage.piglets_to_pigs_ratio, InputError::NotEnoughPiglets);
 
         // validate if piglets len is a common divisor of piglets_to_pigs_ratio
