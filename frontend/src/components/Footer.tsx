@@ -10,7 +10,7 @@ const Footer = () => {
 
   return (
     <footer className="fixed bottom-0 w-full h-[60px] items-center flex justify-between px-5 bg-transparent backdrop-blur-sm border-t border-white/10 z-30">
-      <div className="text-xs">© 2022 Powered by Degens, BlazinglyFast</div>
+      <div className="text-xs">© {new Date().getFullYear()} Powered by Degens, BlazinglyFast</div>
       <div className="flex space-x-5">
         <div>{assets.pigs} 🐖</div>
         <div>{assets.piglets} 🐷</div>
