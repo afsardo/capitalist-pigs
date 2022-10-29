@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Wallet } from "fuels";
-import { PigsAbi__factory } from "../contracts/pigs";
+import { PigsAbi__factory } from "../contracts";
 
 // The private key of the `owner` in chainConfig.json.
 // This enables us to have an account with an initial balance.
