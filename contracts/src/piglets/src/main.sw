@@ -32,7 +32,6 @@ storage {
     total_supply: u64 = 0,
     tokens_minted: u64 = 0,
     piglets_to_pigs_ratio: u64 = 0,
-    // not recomended in prod lol stefan fault im just copy pasta peasant
     piglets: StorageMap<Identity, Vec<u64>> = StorageMap {}, 
 }
 
