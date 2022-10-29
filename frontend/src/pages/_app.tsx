@@ -1,9 +1,13 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 import Footer from "src/components/Footer";
-import Navbar from "src/components/Navbar";
 
 import "../styles/globals.css";
+
+const Navbar = dynamic(() => import("../components/Navbar"), {
+  ssr: false,
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

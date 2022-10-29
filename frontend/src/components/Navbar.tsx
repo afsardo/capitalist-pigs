@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import useLocalStorage from "hooks/useLocalStorage";
 
 import {
   BanknotesIcon,
@@ -30,7 +31,18 @@ const routes = [
 
 const Navbar = () => {
   const router = useRouter();
-  const [key, setKey] = useState("");
+  const [newKey, setNewKey] = useState("");
+  const [key, setKey] = useLocalStorage("key", null);
+
+  const saveNewKey = () => {
+    // TODO: query contract for airdrop claim
+    setKey(newKey);
+    setNewKey("");
+  };
+
+  const removeKey = () => {
+    setKey(null);
+  };
 
   return (
     <div className="fixed w-full h-[60px] justify-center items-center flex bg-transparent backdrop-blur-sm border-b border-white/10 z-30">
@@ -49,17 +61,19 @@ const Navbar = () => {
           </li>
         ))}
       </ul>
-      <form className="absolute right-5">
-        <input
-          className="mr-3 text-black"
-          value={key}
-          placeholder="private key"
-          onChange={(e) => setKey(e.target.value)}
-        />
-        <button className="bg-white text-black px-2 border rounded pointer">
-          ✓
-        </button>
-      </form>
+      {
+        !key ? (
+          <form className="absolute right-5 flex" onSubmit={saveNewKey}>
+            <input className="mr-3 text-black" value={newKey} placeholder="private key" onChange={(e) => setNewKey(e.target.value)} />
+            <button className="bg-white text-black px-2 border rounded pointer">✓</button>
+          </form>
+        ) : (
+          <div className="absolute right-5 flex">
+            <div>{key}</div>
+            <button className="bg-white text-black px-2 border rounded pointer" onClick={removeKey}>x</button>
+          </div>
+        )
+      }
     </div>
   );
 };

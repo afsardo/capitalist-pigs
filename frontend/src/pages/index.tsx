@@ -2,8 +2,6 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect } from "react";
 
-import Heading from "src/components/Heading";
-
 const Counter = dynamic(() => import("../components/Counter"), {
   ssr: false,
 });
