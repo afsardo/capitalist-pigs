@@ -60,6 +60,15 @@ fn remove_piglet_from_owner_map(owner: Identity, piglet_id: u64) {
     }
 }
 
+#[storage(read, write)]
+fn burn(token_id: u64, owner: Identity) {
+    storage.owners.insert(token_id, Option::None());
+    remove_piglet_from_owner_map(owner, token_id);
+    storage.total_supply -= 1;
+}
+
+///
+
 impl PigletNFT for Contract {
     #[storage(read, write)]
     fn constructor(factory: ContractId, admin: Identity, piglet_minter: Identity) {
@@ -184,17 +193,16 @@ impl PigletNFT for Contract {
 
     #[storage(read, write)]
     fn burn(token_id: u64) {
+        let sender = msg_sender().unwrap();
+
         // Ensure this is a valid token
         let token_owner = storage.owners.get(token_id);
         require(token_owner.is_some(), InputError::TokenDoesNotExist);
 
         // Ensure the sender owns the token that is provided
-        let sender = msg_sender().unwrap();
         require(token_owner.unwrap() == sender, AccessError::SenderNotOwner);
 
-        storage.owners.insert(token_id, Option::None());
-        remove_piglet_from_owner_map(sender, token_id);
-        storage.total_supply -= 1;
+        burn(token_id, sender)
     }
     
     #[storage(read, write)]
@@ -254,6 +262,12 @@ impl PigletNFT for Contract {
         let factory_id: b256  = storage.factory.into();
         let factory_contract  = abi(PIG_ABI, factory_id);
         factory_contract.mint(pigs_to_mint, sender)
+
+        index = 0
+        while index < piglets.len() {
+            burn(token_id, sender)
+            index += 1;
+        }
     }
 
     #[storage(read, write)]
