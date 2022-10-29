@@ -187,11 +187,11 @@ impl NFT for Contract {
     fn mint(amount: u64, to: Identity) {
         let tokens_minted = storage.tokens_minted;
         let total_mint = tokens_minted + amount;
+
         // The current number of tokens minted plus the amount to be minted cannot be
         // greater than the total supply or the current allowed amount according to the `inflation_rate`
-
-        let current_time: u64 = timestamp();
-        let inflation_allowed_max_supply: u64 = storage.snapshotted_supply * (ONE + storage.inflation_rate * ((timestamp() - storage.inflation_start_time()) / storage.inflation_epoch));
+        let elapsed_time: u64 = (timestamp() - storage.inflation_start_time);
+        let inflation_allowed_max_supply: u64 = storage.snapshotted_supply * (ONE + storage.inflation_rate * (elapsed_time / storage.inflation_epoch));
 
         require(storage.max_supply >= total_mint, InputError::NotEnoughTokensToMint);
         if (storage.snapshotted_supply > 0 && inflation_allowed_max_supply > 0) {

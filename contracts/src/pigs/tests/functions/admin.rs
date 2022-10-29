@@ -14,7 +14,7 @@ mod success {
 
         // let new_admin = Option::Some(Identity::Address(owner1.wallet.address().into()));
         let new_admin = Identity::Address(owner1.wallet.address().into());
-        constructor(true, &deploy_wallet.contract, &new_admin, 1).await;
+        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 1, 4102444800, 50, 3600).await;
 
         assert_eq!(admin(&owner1.contract).await, new_admin);
     }
@@ -25,7 +25,7 @@ mod success {
 
         // let new_admin = Option::Some(Identity::Address(owner1.wallet.address().into()));
         let new_admin = Identity::Address(owner1.wallet.address().into());
-        constructor(true, &deploy_wallet.contract, &new_admin, 1).await;
+        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 1, 4102444800, 50, 3600).await;
 
         assert_eq!(admin(&owner1.contract).await, new_admin);
 

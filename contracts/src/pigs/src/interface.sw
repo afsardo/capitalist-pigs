@@ -224,24 +224,3 @@ abi NFT {
     #[storage(read, write)]
     fn transfer_from(from: Identity, to: Identity, token_id: u64);
 }
-
-pub struct OperatorEvent {
-    /// Determines whether approval to transfer all of the owner's tokens has been given or revoked.
-    approve: bool,
-    /// The user which may or may not transfer all tokens on the owner's behalf.
-    operator: Identity,
-    /// The user which has given or revoked approval to the operator to transfer all of their
-    /// tokens on their behalf.
-    owner: Identity,
-}
-
-pub struct TransferEvent {
-    /// The user which previously owned the token that has been transfered.
-    from: Identity,
-    // The user that made the transfer. This can be the owner, the approved user, or the operator.
-    sender: Identity,
-    /// The user which now owns the token that has been transfered.
-    to: Identity,
-    /// The unique identifier of the token which has transfered ownership.
-    token_id: u64,
-}

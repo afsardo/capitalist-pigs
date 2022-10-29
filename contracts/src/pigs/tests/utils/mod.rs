@@ -1,9 +1,9 @@
 use fuels::{contract::contract::CallResponse, prelude::*};
 
-abigen!(Nft, "out/debug/NFT-abi.json");
+abigen!(Pigs, "out/debug/pigs-abi.json");
 
 pub struct Metadata {
-    pub contract: Nft,
+    pub contract: Pigs,
     pub wallet: WalletUnlocked,
 }
 
@@ -11,11 +11,11 @@ pub mod abi_calls {
 
     use super::*;
 
-    pub async fn admin(contract: &Nft) -> Identity {
+    pub async fn admin(contract: &Pigs) -> Identity {
         contract.methods().admin().call().await.unwrap().value
     }
 
-    pub async fn approve(approved: &Identity, contract: &Nft, token_id: u64) -> CallResponse<()> {
+    pub async fn approve(approved: &Identity, contract: &Pigs, token_id: u64) -> CallResponse<()> {
         contract
             .methods()
             .approve(approved.clone(), token_id)
@@ -24,7 +24,7 @@ pub mod abi_calls {
             .unwrap()
     }
 
-    pub async fn approved(contract: &Nft, token_id: u64) -> Identity {
+    pub async fn approved(contract: &Pigs, token_id: u64) -> Identity {
         contract
             .methods()
             .approved(token_id)
@@ -34,7 +34,7 @@ pub mod abi_calls {
             .value
     }
 
-    pub async fn balance_of(contract: &Nft, wallet: &Identity) -> u64 {
+    pub async fn balance_of(contract: &Pigs, wallet: &Identity) -> u64 {
         contract
             .methods()
             .balance_of(wallet.clone())
@@ -44,26 +44,30 @@ pub mod abi_calls {
             .value
     }
 
-    pub async fn burn(contract: &Nft, token_id: u64) -> CallResponse<()> {
+    pub async fn burn(contract: &Pigs, token_id: u64) -> CallResponse<()> {
         contract.methods().burn(token_id).call().await.unwrap()
     }
 
     pub async fn constructor(
         access_control: bool,
-        contract: &Nft,
+        contract: &Pigs,
         owner: &Identity,
+        piglet_transformer: &Identity,
         token_supply: u64,
+        inflation_start_time: u64,
+        inflation_rate: u64,
+        inflation_epoch: u64,
     ) -> CallResponse<()> {
         contract
             .methods()
-            .constructor(access_control, owner.clone(), token_supply)
+            .constructor(access_control, owner.clone(), piglet_transformer.clone(), token_supply, inflation_start_time, inflation_rate, inflation_epoch)
             .call()
             .await
             .unwrap()
     }
 
     pub async fn is_approved_for_all(
-        contract: &Nft,
+        contract: &Pigs,
         operator: &Identity,
         owner: &Identity,
     ) -> bool {
@@ -76,11 +80,11 @@ pub mod abi_calls {
             .value
     }
 
-    pub async fn max_supply(contract: &Nft) -> u64 {
+    pub async fn max_supply(contract: &Pigs) -> u64 {
         contract.methods().max_supply().call().await.unwrap().value
     }
 
-    pub async fn mint(amount: u64, contract: &Nft, owner: &Identity) -> CallResponse<()> {
+    pub async fn mint(amount: u64, contract: &Pigs, owner: &Identity) -> CallResponse<()> {
         contract
             .methods()
             .mint(amount, owner.clone())
@@ -89,7 +93,7 @@ pub mod abi_calls {
             .unwrap()
     }
 
-    pub async fn meta_data(contract: &Nft, token_id: u64) -> TokenMetaData {
+    pub async fn meta_data(contract: &Pigs, token_id: u64) -> TokenMetaData {
         contract
             .methods()
             .meta_data(token_id)
@@ -99,7 +103,7 @@ pub mod abi_calls {
             .value
     }
 
-    pub async fn owner_of(contract: &Nft, token_id: u64) -> Identity {
+    pub async fn owner_of(contract: &Pigs, token_id: u64) -> Identity {
         contract
             .methods()
             .owner_of(token_id)
@@ -111,7 +115,7 @@ pub mod abi_calls {
 
     pub async fn set_approval_for_all(
         approve: bool,
-        contract: &Nft,
+        contract: &Pigs,
         operator: &Identity,
     ) -> CallResponse<()> {
         contract
@@ -122,7 +126,7 @@ pub mod abi_calls {
             .unwrap()
     }
 
-    pub async fn set_admin(contract: &Nft, minter: &Identity) -> CallResponse<()> {
+    pub async fn set_admin(contract: &Pigs, minter: &Identity) -> CallResponse<()> {
         contract
             .methods()
             .set_admin(minter.clone())
@@ -131,7 +135,7 @@ pub mod abi_calls {
             .unwrap()
     }
 
-    pub async fn total_supply(contract: &Nft) -> u64 {
+    pub async fn total_supply(contract: &Pigs) -> u64 {
         contract
             .methods()
             .total_supply()
@@ -142,7 +146,7 @@ pub mod abi_calls {
     }
 
     pub async fn transfer_from(
-        contract: &Nft,
+        contract: &Pigs,
         from: &Identity,
         to: &Identity,
         token_id: u64,
@@ -157,7 +161,6 @@ pub mod abi_calls {
 }
 
 pub mod test_helpers {
-
     use super::*;
 
     pub async fn setup() -> (Metadata, Metadata, Metadata) {
@@ -180,29 +183,29 @@ pub mod test_helpers {
         let wallet2 = wallets.pop().unwrap();
         let wallet3 = wallets.pop().unwrap();
 
-        let nft_id = Contract::deploy(
-            "./out/debug/NFT.bin",
+        let pig_id = Contract::deploy(
+            "./out/debug/pigs.bin",
             &wallet1,
             TxParameters::default(),
             StorageConfiguration::with_storage_path(Some(
-                "./out/debug/NFT-storage_slots.json".to_string(),
+                "./out/debug/pigs-storage_slots.json".to_string(),
             )),
         )
         .await
         .unwrap();
 
         let deploy_wallet = Metadata {
-            contract: Nft::new(nft_id.to_string(), wallet1.clone()),
+            contract: Pigs::new(pig_id.to_string(), wallet1.clone()),
             wallet: wallet1.clone(),
         };
 
         let owner1 = Metadata {
-            contract: Nft::new(nft_id.to_string(), wallet2.clone()),
+            contract: Pigs::new(pig_id.to_string(), wallet2.clone()),
             wallet: wallet2.clone(),
         };
 
         let owner2 = Metadata {
-            contract: Nft::new(nft_id.to_string(), wallet3.clone()),
+            contract: Pigs::new(pig_id.to_string(), wallet3.clone()),
             wallet: wallet3.clone(),
         };
 
