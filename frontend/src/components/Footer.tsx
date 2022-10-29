@@ -5,6 +5,7 @@ const Footer = () => {
     pigs: 0,
     piglets: 0,
     truffles: 0,
+    bacon: 0,
   };
 
   return (
@@ -14,6 +15,7 @@ const Footer = () => {
         <div>{assets.pigs} 🐖</div>
         <div>{assets.piglets} 🐷</div>
         <div>{assets.truffles} 🌰</div>
+        <div>{assets.bacon} 🥓</div>
       </div>
     </footer>
   );
