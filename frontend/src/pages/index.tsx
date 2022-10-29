@@ -94,11 +94,11 @@ export default function Home() {
         </section>
         <section className="h-screen grid place-items-center text-center hide">
           <div>
-            <p className="text-white/70 mb-8 text-lg">
+            <p className="tracking-wider mb-14 text-2xl text-white/50">
               Stop being a peasant today... be a part of the Capitalist Pigs
             </p>
-            <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest animate-bounce">
-              BUY
+            <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest animate-bounce uppercase">
+              Claim
             </button>
           </div>
         </section>
