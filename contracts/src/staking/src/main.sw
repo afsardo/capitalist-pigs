@@ -357,6 +357,8 @@ impl Staking for Contract {
             storage.piglet_to_pig.insert(piglets.get(i).unwrap(), pig);
 
             piglet_contract.transfer_from(msg_sender().unwrap(), Identity::ContractId(~ContractId::from(contract_id())), piglets.get(i).unwrap());
+
+            i += 1;
         }
     }
 
@@ -366,6 +368,7 @@ impl Staking for Contract {
         require(piglets.len() > ZERO, InputError::NullArray);
 
         let i: u64           = 0;
+        let j: u64           = 0;
         let caller: Identity = msg_sender().unwrap();
         let piglet_contract  = abi(Piglet, storage.piglets.unwrap().into());
 
@@ -375,9 +378,16 @@ impl Staking for Contract {
         while (i < piglets.len()) {
             require(storage.piglet_owner.get(piglets.get(i).unwrap()) == caller, AccessControlError::CallerNotPigletOwner);
 
-            
+            storage.piglet_to_pig.insert(piglets.get(i).unwrap(), ZERO);
+            while (j < storage.delegated_piglets.get(storage.piglet_owner.get(piglets.get(i).unwrap()))) {
+                
+                j += 1;
+            }
 
             piglet_contract.transfer_from(Identity::ContractId(~ContractId::from(contract_id())), delegator, piglets.get(i).unwrap());
+
+            j = 0;
+            i += 1;
         }
     }
 

@@ -105,6 +105,8 @@ fn remove_pig(owner: Identity, pig: u64) {
             storage.pigs.get(owner).remove(i);
             break;
         }
+
+        i += 1;
     }
 }
 
@@ -225,11 +227,6 @@ impl Pigs for Contract {
         let all_pigs = storage.pigs.get(owner);
         require(index < all_pigs.len(), InputError::IndexExceedsArrayLength);
         all_pigs.get(index).unwrap()
-    }
-
-    #[storage(read, write)]
-    fn gg(puta_madre: Identity) -> u64 {
-        return 1
     }
 
     #[storage(read, write)]
