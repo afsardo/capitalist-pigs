@@ -60,7 +60,7 @@ export default function Home() {
         </section>
         <section className="h-screen grid place-items-center text-center">
           <div>
-            <h5 className="tracking-wider mb-12">
+            <h5 className="tracking-wider mb-12 text-xl">
               You can now use your mucus to...
             </h5>
             <div className="flex justify-center gap-x-4 mb-8">
@@ -97,7 +97,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <h5 className="animate-bounce font-bold">
+            <h5 className="animate-bounce font-bold text-xl">
               Create <span className="fancy-text uppercase">tons</span> of
               piglets 🐽
             </h5>
@@ -105,8 +105,8 @@ export default function Home() {
         </section>
         <section className="h-screen grid place-items-center text-center hide">
           <div>
-            <p className="text-white/70 mb-8">
-              Stop being a peasant today... be a part of the capital PIGS
+            <p className="text-white/70 mb-8 text-lg">
+              Stop being a peasant today... be a part of the Capitalist Pigs
             </p>
             <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest">
               BUY
