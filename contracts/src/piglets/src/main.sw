@@ -6,9 +6,9 @@ dep interface;
 dep data_structures;
 dep factory_interface;
 
+use constants::{NULLSTRING};
 use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError};
-use constants::{};
 use interface::{PigletNFT};
 use factory_interface::{PIG_ABI};
 use std::{
@@ -27,7 +27,7 @@ use std::{
 
 storage {
     admin: Option<Identity> = Option::None,
-    pig_contract: Option<Identity> = Option::None,
+    piglet_minter: Option<Identity> = Option::None,
     factory: ContractId = ~ContractId::from(0x0000000000000000000000000000000000000000000000000000000000000000),
     approved: StorageMap<u64, Option<Identity>> = StorageMap {},
     balances: StorageMap<Identity, u64> = StorageMap {},
@@ -46,7 +46,7 @@ storage {
 #[storage(read, write)]
 fn add_piglet_to_owner_map(owner: Identity, piglet_id: u64) {
     storage.piglets.get(owner).push(piglet_id);
-    storage.balances.insert(owner, storage.balances.get(to) + 1);
+    storage.balances.insert(owner, storage.balances.get(owner) + 1);
 }
 
 #[storage(read, write)]
@@ -56,8 +56,8 @@ fn remove_piglet_from_owner_map(owner: Identity, piglet_id: u64) {
 
     while (i < owned_piglets.len()) {
         if (owned_piglets.get(i).unwrap() == piglet_id) {
-            storage.pigs.get(owner).remove(i);
-            storage.balances.insert(owner, storage.balances.get(from) - 1);
+            storage.piglets.get(owner).remove(i);
+            storage.balances.insert(owner, storage.balances.get(owner) - 1);
             break;
         }
     }
@@ -77,17 +77,19 @@ impl PigletNFT for Contract {
         factory: ContractId,
         admin: Identity,
         piglet_minter: Identity,
+        piglets_to_pigs_ratio: u64,
     ) {
         let admin = Option::Some(admin);
         let piglet_minter = Option::Some(piglet_minter);
 
-        require(storage.piglet_minter, InitError::CannotReinitialize);
-        require(factory != BASE_ASSET_ID, ParamError::InvalidFactory);
+        require(storage.piglet_minter.is_some(), InitError::CannotReinitialize);
+        require(factory != BASE_ASSET_ID, InitError::InvalidFactory);
         require(admin.is_some(), InitError::AdminIsNone);
         require(piglet_minter.is_some(), InitError::PigletMinterIsNone);
+        require(piglets_to_pigs_ratio > 0 , InitError::PigletsToPigRatioCannotBeZero);
 
         storage.admin = admin;
-        storage.pig_contract = pig_contract;
+        storage.factory = factory;
         storage.piglet_minter = piglet_minter;
         storage.piglets_to_pigs_ratio = piglets_to_pigs_ratio;
     }
@@ -118,13 +120,6 @@ impl PigletNFT for Contract {
     }
 
     #[storage(read)]
-    fn meta_data(token_id: u64) -> TokenMetaData {
-        let token_metadata = storage.meta_data.get(token_id);
-        require(token_metadata.is_some(), InputError::TokenDoesNotExist);
-        return token_metadata;
-    }
-
-    #[storage(read)]
     fn owner_of(token_id: u64) -> Identity {
         let owner = storage.owners.get(token_id);
         require(owner.is_some(), InputError::OwnerDoesNotExist);
@@ -138,17 +133,18 @@ impl PigletNFT for Contract {
 
     #[storage(read)]
     fn piglet_minter() -> Identity {
-        return storage.piglet_minter;
+        let piglet_minter = storage.piglet_minter;
+        return piglet_minter.unwrap();
     }
 
     #[storage(read)]
     fn get_factory() -> ContractId {
-        storage.factory
+        return storage.factory;
     }
 
     #[storage(read)]
     fn piglets(owner: Identity) -> Vec<u64> {
-        storage.piglets.get(owner);
+        return storage.piglets.get(owner);
     }
 
     #[storage(read)]
@@ -210,8 +206,6 @@ impl PigletNFT for Contract {
     #[storage(read, write)]
     fn delegate(pig: u64, piglets: Vec<u64>) {
         let sender = msg_sender().unwrap();
-
-        sender
     }
 
     #[storage(read, write)]
@@ -220,12 +214,11 @@ impl PigletNFT for Contract {
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity) {
         let sender = msg_sender().unwrap();
-        require(storage.piglet_minter == sender, AccessError::SenderNotPigletMinter);
+        require(storage.piglet_minter.unwrap() == sender, AccessError::SenderNotPigletMinter);
 
-        let mut index = tokens_minted;
-        let total_minted_after_execution = tokens_minted + amount;
+        let mut index = storage.tokens_minted;
+        let total_minted_after_execution = storage.tokens_minted + amount;
         while index < total_minted_after_execution {
-            // Create the TokenMetaData for this new token
             storage.meta_data.insert(index, ~TokenMetaData::new());
             storage.owners.insert(index, Option::Some(to));
             add_piglet_to_owner_map(to, index);
@@ -255,7 +248,7 @@ impl PigletNFT for Contract {
             let token_id = piglets.get(index).unwrap();
             let token_owner = storage.owners.get(token_id);
             require(token_owner.is_some(), InputError::TokenDoesNotExist);
-            require(token_owner.unwrap() == sender, InputError::SenderNotOwner);
+            require(token_owner.unwrap() == sender, AccessError::SenderNotOwner);
             index += 1;
         }
 

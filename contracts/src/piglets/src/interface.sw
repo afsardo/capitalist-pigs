@@ -1,16 +1,12 @@
 library interface;
 dep data_structures;
 use data_structures::TokenMetaData;
-<<<<<<< Updated upstream
 use std::{
     identity::Identity,
     contract_id::ContractId,
     vec::Vec
 };
 
-=======
-use std::{contract_id::ContractId, identity::Identity, vec::Vec};
->>>>>>> Stashed changes
 abi PigletNFT {
     /// Returns the current admin for the contract.
     ///
@@ -19,10 +15,6 @@ abi PigletNFT {
     /// * When the contract does not have an admin.
     #[storage(read)]
     fn admin() -> Identity;
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     /// Gives approval to the `approved` user to transfer a specific token on another user's behalf.
     ///
     /// To revoke approval the approved user should be `None`.
@@ -80,15 +72,17 @@ abi PigletNFT {
     ///
     /// # Arguments
     ///
+    /// * `factory` - The original contract that generates this contract
     /// * `admin` - The user which is admin
     /// * `piglet_minter` - The contract that has the ability to mint new piglet NFTs if the `admin` is null.
+    /// * `piglets_to_pigs_ratio` - the ratio at which X piglets will convert into a pig
     ///
     /// # Reverts
     ///
     /// * When the constructor function has already been called.
     /// * When the `token_supply` is set to 0.
     #[storage(read, write)]
-    fn constructor(factory: ContractId, admin: Identity, piglet_minter: Identity);
+    fn constructor(factory: ContractId, admin: Identity, piglet_minter: Identity, piglets_to_pigs_ratio: u64);
     /// Delegate the piglets of sender to a pig
     ///
     /// # Arguments
@@ -153,17 +147,7 @@ abi PigletNFT {
     /// * When the Pig Contract fails
     #[storage(read, write)]
     fn mintPigs(piglets: Vec<u64>);
-    /// Returns the metadata for the token specified
-    ///
-    /// # Arguments
-    ///
-    /// * `token_id` - The unique identifier of the token.
-    ///
-    /// # Reverts
-    ///
-    /// * When the `token_id` does not map to an exsiting token.
-    #[storage(read)]
-    fn meta_data(token_id: u64) -> TokenMetaData;
+
     /// Returns the user which owns the specified token.
     ///
     /// # Arguments
@@ -179,10 +163,6 @@ abi PigletNFT {
     // Return the piglets_to_pigs_ratio
     #[storage(read)]
     fn piglets_to_pigs_ratio() -> u64;
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     /// Returns the whole array of piglets that a user holds.
     ///
     /// # Arguments
@@ -190,17 +170,11 @@ abi PigletNFT {
     /// * `owner` - The owner for which we return the whole array of piglets they currently hold
     #[storage(read)]
     fn piglets(owner: Identity) -> Vec<u64>;
-<<<<<<< Updated upstream
 
     /// Returns the factory contract.
     #[storage(read)]
     fn get_factory() -> ContractId;
 
-=======
-    /// Returns the factory contract.
-    #[storage(read)]
-    fn get_factory() -> ContractId;
->>>>>>> Stashed changes
     /// Returns the piglet minter for the contract.
     #[storage(read)]
     fn piglet_minter() -> Identity;

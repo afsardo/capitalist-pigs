@@ -5,12 +5,15 @@ pub enum AccessError {
     SenderCannotSetPigletMinter: (),
     SenderNotOwnerOrApproved: (),
     SenderNotPigletMinter: (),
+    SenderNotOwner: (),
 }
 
 pub enum InitError {
     AdminIsNone: (),
     PigletMinterIsNone: (),
     CannotReinitialize: (),
+    PigletsToPigRatioCannotBeZero: (),
+    InvalidFactory: (),
 }
 
 pub enum InputError {
@@ -21,5 +24,4 @@ pub enum InputError {
     InvalidTokenSize: (),
     NotEnoughPiglets: (),
     InvalidNumberOfPiglets: (),
-    SenderNotOwner: (),
 }
