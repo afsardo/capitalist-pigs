@@ -3,7 +3,7 @@ library interface;
 dep data_structures;
 
 use data_structures::TokenMetaData;
-use std::{identity::Identity, option::Option};
+use std::{identity::Identity, vec::Vec};
 
 abi PigletNFT {
     /// Returns the current admin for the contract.
@@ -177,7 +177,15 @@ abi PigletNFT {
     /// * When there is no owner for the `token_id`.
     #[storage(read)]
     fn owner_of(token_id: u64) -> Identity;
-
+    
+    /// Returns the whole array of piglets that a user holds.
+    ///
+    /// # Arguments
+    ///
+    /// * `owner` - The owner for which we return the whole array of piglets they currently hold
+    #[storage(read)]
+    fn piglets(owner: Identity) -> Vec<u64>;
+    
     /// Returns the current piglet minter for the contract.
     ///
     /// # Reverts

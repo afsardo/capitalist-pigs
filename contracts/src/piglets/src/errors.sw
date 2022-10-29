@@ -5,6 +5,7 @@ pub enum AccessError {
     SenderCannotSetPigletMinter: (),
     SenderNotOwner: (),
     SenderNotOwnerOrApproved: (),
+    SenderNotPigletMinter: (),
 }
 
 pub enum InitError {
