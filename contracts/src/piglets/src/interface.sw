@@ -111,18 +111,19 @@ abi PigletNFT {
     #[storage(read, write)]
     fn delegate(pig: u64, piglets: [u64]);
 
-    /// Removes the piglets from being delegated
+    /// Removes the piglets delegation from pig
     ///
     /// # Arguments
     ///
-    /// * `piglets` - The Piglets which will be delegated
+    /// * `pig` - The Pig which will have the piglets undelegated
+    /// * `piglets` - The Piglets which will be undelegated
     ///
     /// # Reverts
     ///
-    /// * When piglets are not delegated
-    /// * When piglets are not owned by sender
+    /// * When pig is not staked
+    /// * When Staking contract fails
     #[storage(read, write)]
-    fn remove_delegation(piglets: [u64]);
+    fn remove_delegation(pig: u64, piglets: [u64]);
 
     /// Returns whether the `operator` user is approved to transfer all tokens on the `owner`
     /// user's behalf.
