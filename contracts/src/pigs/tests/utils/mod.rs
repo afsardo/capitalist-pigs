@@ -195,17 +195,17 @@ pub mod test_helpers {
         .unwrap();
 
         let deploy_wallet = Metadata {
-            contract: Pigs::new(pig_id.to_string(), wallet1.clone()),
+            contract: Pigs::new(Bech32ContractId::from(ContractId::from(&pig_id)), wallet1.clone()),
             wallet: wallet1.clone(),
         };
 
         let owner1 = Metadata {
-            contract: Pigs::new(pig_id.to_string(), wallet2.clone()),
+            contract: Pigs::new(Bech32ContractId::from(ContractId::from(&pig_id)), wallet2.clone()),
             wallet: wallet2.clone(),
         };
 
         let owner2 = Metadata {
-            contract: Pigs::new(pig_id.to_string(), wallet3.clone()),
+            contract: Pigs::new(Bech32ContractId::from(ContractId::from(&pig_id)), wallet3.clone()),
             wallet: wallet3.clone(),
         };
 

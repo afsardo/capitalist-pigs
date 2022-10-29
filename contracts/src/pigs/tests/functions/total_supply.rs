@@ -2,7 +2,7 @@ use crate::utils::{
     abi_calls::{constructor, mint, total_supply},
     test_helpers::setup,
 };
-use fuels::{prelude::Identity, signers::Signer};
+use fuels::{prelude::Identity, prelude::ContractId, signers::Signer};
 
 mod success {
 
@@ -12,7 +12,6 @@ mod success {
     async fn gets_total_supply() {
         let (deploy_wallet, owner1, _owner2) = setup().await;
 
-        // constructor(false, &deploy_wallet.contract, &Option::None(), 10).await;
         let admin = Identity::Address(owner1.wallet.address().into());
         constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 10, 4102444800, 50, 3600).await;
 

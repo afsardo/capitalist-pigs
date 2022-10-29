@@ -3,7 +3,7 @@ use crate::utils::{
     test_helpers::setup,
     TokenMetaData,
 };
-use fuels::{prelude::Identity, signers::Signer};
+use fuels::{prelude::Identity, prelude::ContractId, signers::Signer};
 
 mod success {
 

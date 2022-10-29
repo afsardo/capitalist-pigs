@@ -4,7 +4,7 @@ use crate::utils::{
     },
     test_helpers::setup,
 };
-use fuels::{prelude::Identity, signers::Signer};
+use fuels::{prelude::Identity, prelude::ContractId, signers::Signer};
 
 mod success {
 
@@ -16,7 +16,7 @@ mod success {
 
         // constructor(false, &deploy_wallet.contract, &Option::None(), 1).await;
         let admin = Identity::Address(owner1.wallet.address().into());
-        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 1, 4102444800, 50, 3600).await;
+        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 5, 4102444800, 50, 3600).await;
 
         let minter = Identity::Address(owner1.wallet.address().into());
         let to = Identity::Address(owner2.wallet.address().into());
@@ -42,7 +42,7 @@ mod success {
 
         // constructor(false, &deploy_wallet.contract, &Option::None(), 1).await;
         let admin = Identity::Address(owner1.wallet.address().into());
-        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 1, 4102444800, 50, 3600).await;
+        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 5, 4102444800, 50, 3600).await;
 
         let minter = Identity::Address(owner1.wallet.address().into());
         let to = Identity::Address(owner2.wallet.address().into());
@@ -71,7 +71,7 @@ mod success {
 
         // constructor(false, &deploy_wallet.contract, &Option::None(), 1).await;
         let admin = Identity::Address(owner1.wallet.address().into());
-        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 1, 4102444800, 50, 3600).await;
+        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 5, 4102444800, 50, 3600).await;
 
         let minter = Identity::Address(owner1.wallet.address().into());
         let operator = Identity::Address(owner2.wallet.address().into());
@@ -87,10 +87,6 @@ mod success {
 
         transfer_from(&owner2.contract, &minter, &operator, 0).await;
 
-        // assert_eq!(
-        //     owner_of(&owner1.contract, 0).await,
-        //     Option::Some(operator.clone())
-        // );
         assert_eq!(owner_of(&owner1.contract, 0).await, operator.clone());
         assert_eq!(balance_of(&owner1.contract, &minter).await, 0);
         assert_eq!(balance_of(&owner2.contract, &operator).await, 1);
@@ -165,7 +161,7 @@ mod reverts {
 
         // constructor(false, &deploy_wallet.contract, &Option::None(), 1).await;
         let admin = Identity::Address(owner1.wallet.address().into());
-        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 1, 4102444800, 50, 3600).await;
+        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 5, 4102444800, 50, 3600).await;
 
         let minter = Identity::Address(owner1.wallet.address().into());
         mint(1, &owner1.contract, &minter).await;
