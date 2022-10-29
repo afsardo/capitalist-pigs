@@ -58,13 +58,13 @@ abi StakingABI {
     #[storage(read)]
     fn delegate_balance_of(delegator: Identity) -> u64;
 
-    /// Return the staking power of a pig staker
+    /// Return the staking power of a pig (taking into account delegated piglets)
     ///
     /// # Arguments
     ///
-    /// * `user` - The staker whose staking power we return
+    /// * `pig` - The pig whose staking power we return
     #[storage(read)]
-    fn staking_power(user: Identity) -> u64;
+    fn staking_power(pig: u64) -> u64;
 
     /// Return a piglet at an index in a delegator's piglet array
     ///
@@ -119,14 +119,6 @@ abi StakingABI {
     #[storage(read)]
     fn accrued_piglet_fees(piglet: u64) -> u64;
 
-    /// Return the delegators of a pig
-    ///
-    /// # Arguments
-    ///
-    /// * `pig` - The pig for which we return all delegators
-    #[storage(read)]
-    fn delegators(pig: u64) -> Vec<Identity>;
-
     /// Delegate piglets to a pig
     ///
     /// # Arguments
@@ -135,7 +127,7 @@ abi StakingABI {
     /// * `pig` - The pig to delegate piglets to
     /// * `piglets` - The piglets that are delegated to the `pig`
     #[storage(read, write)]
-    fn delegate(delegator: Identity, pig: u64, piglets: [u64]);
+    fn delegate(delegator: Identity, pig: u64, piglets: Vec<u64>);
 
     /// Undelegate piglets from a pig
     ///
@@ -145,7 +137,7 @@ abi StakingABI {
     /// * `pig` - The pig to undelegate piglets to
     /// * `piglets` - The piglets that are undelegated from the `pig`
     #[storage(read, write)]
-    fn undelegate(delegator: Identity, pig: u64, piglets: [u64]);
+    fn undelegate(delegator: Identity, pig: u64, piglets: Vec<u64>);
 
     /// Stake a pig in the contract
     ///

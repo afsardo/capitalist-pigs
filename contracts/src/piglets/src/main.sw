@@ -56,7 +56,7 @@ fn add_piglet_to_owner_map(owner: Identity, piglet_id: u64) {
 
 #[storage(read, write)]
 fn remove_piglet_from_owner_map(owner: Identity, piglet_id: u64) {
-    let i: u64 = 0;
+    let mut i: u64 = 0;
     let owned_piglets: Vec<u64> = storage.piglets.get(owner);
 
     while (i < owned_piglets.len()) {
