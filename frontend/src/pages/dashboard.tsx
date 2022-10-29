@@ -4,7 +4,7 @@ import Image from "next/image";
 const Dashboard = () => {
   return (
     <>
-      <div className="flex justify-center">
+      <div className="flex justify-center mt-[60px]">
         <div className="flex items-center flex-col gap-4">
           <Image
             src="/pig_dashboard.jpeg"

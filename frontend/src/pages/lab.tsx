@@ -8,7 +8,7 @@ import Select from "src/components/Select";
 const Lab = () => {
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-center gap-4">
+      <div className="flex flex-col md:flex-row justify-center gap-4 mt-[60px]">
         {/* <div className="flex items-center flex-col gap-4">
         <Image src="/pig_coop.jpeg" alt="co-op" width={600} height={600} />
         <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest">

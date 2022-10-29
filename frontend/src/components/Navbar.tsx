@@ -31,10 +31,6 @@ const routes = [
   },
 ];
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export default function Example() {
   const router = useRouter();
   const [newKey, setNewKey] = useState("");
@@ -53,13 +49,13 @@ export default function Example() {
   return (
     <Disclosure
       as="nav"
-      className="w-full h-[60px] bg-transparent backdrop-blur-sm border-b border-white/10 z-30 fixed inset-0 bottom-auto"
+      className="w-full bg-transparent backdrop-blur-sm border-b border-white/10 z-30 fixed inset-0 bottom-auto"
     >
       {({ open, close }) => {
         return (
           <>
             <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
-              <div className="relative flex h-16 items-center justify-between">
+              <div className="relative flex h-[60px] items-center justify-between">
                 <div className="flex items-center px-2 lg:px-0">
                   <div className="hidden lg:ml-6 lg:block">
                     <ul className="flex justify-center gap-5 text-xl">
@@ -132,8 +128,8 @@ export default function Example() {
               </div>
             </div>
 
-            <Disclosure.Panel className="lg:hidden">
-              <ul className="space-y-1 px-2 pt-2 pb-3 bg-black">
+            <Disclosure.Panel className="lg:hidden backdrop-blur-md">
+              <ul className="space-y-1 px-2 pt-2 pb-3">
                 {routes.map((route) => {
                   const isActive = router.pathname === route.href;
                   return (

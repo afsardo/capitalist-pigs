@@ -22,7 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <div className="min-h-screen bg-black text-[#F1F7ED] flex flex-col">
         <Navbar />
-        <div className="mt-[64px] max-w-5xl w-full mx-auto py-4 flex-1 px-4">
+        <div className="max-w-5xl w-full mx-auto py-4 flex-1 px-4">
           <Component {...pageProps} />
         </div>
         <Footer />
