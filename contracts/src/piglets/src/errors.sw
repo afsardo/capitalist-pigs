@@ -10,6 +10,8 @@ pub enum AccessError {
 
 pub enum InitError {
     AdminIsNone: (),
+    NotEnoughPiglets: (),
+    InvalidNumberOfPiglets: (),
     PigletMinterIsNone: (),
     CannotReinitialize: (),
 }
@@ -19,4 +21,5 @@ pub enum InputError {
     ApprovedDoesNotExist: (),
     OwnerDoesNotExist: (),
     TokenDoesNotExist: (),
+    InvalidTokenSize: (),
 }
