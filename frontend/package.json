@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "export": "next export",
-    "deploy": "yarn build && yarn export && arweave deploy-dir out --key-file arweave-wallet.json"
+    "arweave-deploy": "yarn build && yarn export && arweave deploy-dir out --key-file arweave-wallet.json"
   },
   "dependencies": {
     "fuels": "^0.17.0",
