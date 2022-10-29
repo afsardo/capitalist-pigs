@@ -8,14 +8,6 @@ source = 'git+https://github.com/fuellabs/sway?tag=v0.28.1#84f9aad376760cd9c8eac
 dependencies = ['core']
 
 [[package]]
-name = 'truffle_exchange_helpers'
-source = 'path+from-root-5D8D89CBD7A9E338'
-dependencies = ['std']
-
-[[package]]
 name = 'truffles'
 source = 'root'
-dependencies = [
-    'std',
-    'truffle_exchange_helpers',
-]
+dependencies = ['std']

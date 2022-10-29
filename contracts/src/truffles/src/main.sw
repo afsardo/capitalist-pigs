@@ -4,6 +4,7 @@ dep data_structures;
 
 use std::{
     address::*,
+    chain::auth::*,
     context::{
         *,
         call_frames::*,
@@ -15,7 +16,6 @@ use std::{
 };
 
 use data_structures::Truffles;
-use truffle_exchange_helpers::get_msg_sender_address_or_panic;
 
 const ZERO_B256 = 0x0000000000000000000000000000000000000000000000000000000000000000;
 
@@ -32,6 +32,16 @@ enum Error {
     CannotReinitialize: (),
     MintIsClosed: (),
     NotOwner: (),
+}
+
+/// Return the sender as an Address or panic
+fn get_msg_sender_address_or_panic() -> Address {
+    let sender: Result<Identity, AuthError> = msg_sender();
+    if let Identity::Address(address) = sender.unwrap() {
+        address
+    } else {
+        revert(0);
+    }
 }
 
 #[storage(read)]
