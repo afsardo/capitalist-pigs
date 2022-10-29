@@ -1,21 +1,14 @@
 import React from "react";
 import Image from "next/image";
 
-import Heading from "src/components/Heading";
-
 const Dashboard = () => {
   return (
-    <div>
-      <Heading className="mb-5">Dashboard</Heading>
-
-      <div className="flex gap-4">
-        <Image src="/pig.jpeg" alt="lab" width={300} height={300} />
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit,
-          magni! Quae, excepturi. Harum, error culpa? Beatae aliquid ipsum
-          recusandae provident minus. Nulla amet aut, earum sapiente
-          consequuntur perspiciatis veniam ab.
-        </p>
+    <div className="flex justify-center">
+      <div className="flex items-center flex-col gap-4">
+        <Image src="/pig_dashboard.jpeg" alt="dashboard" width={600} height={600} />
+        <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest">
+          SELL
+        </button>
       </div>
     </div>
   );

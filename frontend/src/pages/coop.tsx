@@ -1,16 +1,15 @@
 import React from "react";
-
-import Heading from "src/components/Heading";
+import Image from "next/image";
 
 const Coop = () => {
   return (
-    <div>
-      <Heading className="mb-5">Co-op</Heading>
-      <p>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Odio mollitia
-        officiis culpa, ullam qui nisi minus ratione aut numquam sint id non
-        quae incidunt deserunt ab soluta voluptates reprehenderit iure.
-      </p>
+    <div className="flex justify-center">
+      <div className="flex items-center flex-col gap-4">
+        <Image src="/pig_coop.jpeg" alt="co-op" width={600} height={600} />
+        <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest">
+          STAKE
+        </button>
+      </div>
     </div>
   );
 };
