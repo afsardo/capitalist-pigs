@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import useLocalStorage from "hooks/useLocalStorage";
+import useLocalStorage from "../hooks/useLocalStorage";
 import { Disclosure } from "@headlessui/react";
 
 import {
