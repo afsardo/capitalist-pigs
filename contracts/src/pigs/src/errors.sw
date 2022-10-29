@@ -24,6 +24,7 @@ pub enum InflationError {
 
 pub enum InputError {
     AdminDoesNotExist: (),
+    IndexExceedsArrayLength: (),
     PigletTransformerDoesNotExist: (),
     ApprovedDoesNotExist: (),
     NotEnoughTokensToMint: (),
