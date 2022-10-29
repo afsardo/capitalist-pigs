@@ -14,11 +14,15 @@ abi Staking {
     /// * `fees_per_second` - The amount of fees sent accruing to each staked pig every second
     /// * `truffles_per_second` - The amount of truffles minted per second for each staked pig
     #[storage(read, write)]
-    fn constructor(pigs: ContractId, fee_token: ContractId, fee_distributor: ContractId, truffles: ContractId, fees_per_second: u64, truffles_per_second: u64);
+    fn constructor(pigs: ContractId, piglets: ContractId, fee_token: ContractId, fee_distributor: ContractId, truffles: ContractId, fees_per_second: u64, truffles_per_second: u64);
 
     /// Returns the address of the Pig NFT contract
     #[storage(read)]
     fn pigs() -> ContractId;
+
+    /// Returns the address of the Piglet NFT contract
+    #[storage(read)]
+    fn piglets() -> ContractId;
 
     /// Returns the address of the fee token offered for staking
     #[storage(read)]

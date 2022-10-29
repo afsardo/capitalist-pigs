@@ -44,7 +44,7 @@ storage {
     /// The piglets delegated to each pig
     piglet_to_pig: StorageMap<u64, u64> = StorageMap {},
     /// The commission offered to delegators of a specific pig
-    fee_commission: StorageMap<u64, u64> = StorageMap {},
+    fee_commission: u64 = 0,
     /// Total amount of fees distributed per second to each staked pig
     fees_per_second: u64 = 0,
     /// Amount of new truffles that can be minted each second for a staked pig
@@ -52,8 +52,13 @@ storage {
     /// The last timestamp when a pig staker claimed fees
     last_pig_fee_claim: StorageMap<u64, u64> = StorageMap {},
     /// The last timestamp when a pig staker minted accrued truffles
-    last_pig_truffle_mint: StorageMap<u64, u64> = StorageMap {}
-};
+    last_pig_truffle_mint: StorageMap<u64, u64> = StorageMap {},
+}
+
+pub struct TokenMetaData {
+    // This is left as an example. Support for dynamic length string is needed here
+    name: str[7],
+}
 
 ///////
 // ABIs
@@ -133,31 +138,40 @@ abi Piglet {
     fn burn(token_id: u64);
 
     #[storage(read, write)]
-    fn constructor(access_control: bool, admin: Identity, piglet_minter: Identity, max_supply: u64);
+    fn constructor(staking_factory: ContractId, factory: ContractId, admin: Identity, piglet_minter: Identity, piglets_to_pigs_ratio: u64);
 
     #[storage(read, write)]
-    fn delegate(pig: u64, piglets: [u64]);
+    fn delegate(pig: u64, piglets: Vec<u64>);
 
     #[storage(read, write)]
-    fn remove_delegation(pig: u64, piglets: [u64]);
+    fn remove_delegation(pig: u64, piglets: Vec<u64>);
 
     #[storage(read)]
     fn is_approved_for_all(operator: Identity, owner: Identity) -> bool;
-
-    #[storage(read)]
-    fn max_supply() -> u64;
 
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity);
 
     #[storage(read, write)]
-    fn mintPigs(piglets: [u64]) -> [u64];
-
-    #[storage(read)]
-    fn meta_data(token_id: u64) -> TokenMetaData;
+    fn mintPigs(piglets: Vec<u64>);
 
     #[storage(read)]
     fn owner_of(token_id: u64) -> Identity;
+
+    #[storage(read)]
+    fn piglets_to_pigs_ratio() -> u64;
+
+    #[storage(read)]
+    fn piglets(owner: Identity) -> Vec<u64>;
+
+    #[storage(read)]
+    fn get_factory() -> ContractId;
+
+    #[storage(read)]
+    fn get_staking_factory() -> ContractId;
+
+    #[storage(read)]
+    fn piglet_minter() -> Identity;
 
     #[storage(read, write)]
     fn set_admin(admin: Identity);
@@ -222,9 +236,13 @@ abi BaconDistributor {
 // Internal Methods
 ///////////////////
 /// Claim fees for the pig staker and users who delegated piglets to the target pig
-#[storage(read, write)] fn _claim_fees(pig: u64) {
+#[storage(read, write)]
+fn _claim_fees(pig: u64) {
 
 }
+
+
+
 
 impl Staking for Contract {
     #[storage(read, write)]
@@ -277,14 +295,15 @@ impl Staking for Contract {
 
     #[storage(read)]
     fn staked_pigs(user: Identity, index: u64) -> u64 {
-        let all_pigs = storage.staked_pigs;
+        let all_pigs = storage.staked_pigs.get(user);
         require(index < all_pigs.len(), InputError::IndexExceedsArrayLength);
         all_pigs.get(index)
     }
 
     #[storage(read)]
     fn balance_of(user: Identity) -> u64 {
-        storage.staked_pigs.get(user).len()
+        let all_pigs = storage.staked_pigs.get(user);
+        all_pigs.len()
     }
 
     #[storage(read)]
@@ -321,20 +340,30 @@ impl Staking for Contract {
 
     #[storage(read)]
     fn accrued_truffles(pig: u64) -> u64 {
-
+        //temp 
+        return 1
     }
 
     #[storage(read)]
-    fn accrued_pig_fees(pig: u64) -> u64;
+    fn accrued_pig_fees(pig: u64) -> u64 {
+        //temp 
+        return 1
+    }
 
     #[storage(read)]
-    fn accrued_piglet_fees(piglet: u64) -> u64;
+    fn accrued_piglet_fees(piglet: u64) -> u64{
+        //temp 
+        return 1
+    }
 
     #[storage(read, write)]
     fn delegate(delegator: Identity, pig: u64, piglets: Vec<u64>) {
+        let caller: Identity = msg_sender().unwrap();
+        
         require(pig > ZERO, InputError::InvalidPig);
         require(piglets.len() > ZERO, InputError::NullArray);
         require(delegator != Identity::ContractId(contract_id()), InputError::CannotAssingToThisContract);
+        require(caller == Identity::ContractId(storage.piglets.unwrap()), AccessControlError::CallerNotPigletContract);
 
         // Check if the target pig is in this contract
         let pigs_contract = abi(Pigs, storage.pig.unwrap().into());
@@ -342,13 +371,14 @@ impl Staking for Contract {
         require(
             storage.pig_owner.get(pig) != Identity::ContractId(~ContractId::from(ZERO_B256)) &&
             storage.pig_owner.get(pig) != Identity::Address(~Address::from(ZERO_B256)) &&
-            pigs_contract.owner_of(pig) == Identity::ContractId(contract_id())
+            pigs_contract.owner_of(pig) == Identity::ContractId(contract_id()),
+            InputError::PigProvidedNotStaked
         );
 
         _claim_fees(pig);
         storage.staking_power.insert(pig, storage.staking_power.get(pig) + piglets.len());
 
-        let i: u64 = 0;
+        let mut i: u64 = 0;
         while (i < piglets.len()) {
             require(piglet_contract.owner_of(piglets.get(i).unwrap()) != Identity::ContractId(contract_id()), InputError::PigletAlreadyDelegated);
 
@@ -364,11 +394,14 @@ impl Staking for Contract {
 
     #[storage(read, write)]
     fn undelegate(delegator: Identity, pig: u64, piglets: Vec<u64>) {
+        let caller: Identity = msg_sender().unwrap();
+
         require(pig > ZERO, InputError::InvalidPig);
         require(piglets.len() > ZERO, InputError::NullArray);
+        require(caller == Identity::ContractId(storage.piglets.unwrap()), AccessControlError::CallerNotPigletContract);
 
-        let i: u64           = 0;
-        let j: u64           = 0;
+        let mut i: u64           = 0;
+        let mut j: u64           = 0;
         let caller: Identity = msg_sender().unwrap();
         let piglet_contract  = abi(Piglet, storage.piglets.unwrap().into());
 
@@ -376,11 +409,10 @@ impl Staking for Contract {
         storage.staking_power.insert(pig, storage.staking_power.get(pig) - piglets.len());
 
         while (i < piglets.len()) {
-            require(storage.piglet_owner.get(piglets.get(i).unwrap()) == caller, AccessControlError::CallerNotPigletOwner);
+            require(storage.piglet_owner.get(piglets.get(i).unwrap()) == delegator, AccessControlError::CallerNotPigletOwner);
 
             storage.piglet_to_pig.insert(piglets.get(i).unwrap(), ZERO);
             while (j < storage.delegated_piglets.get(storage.piglet_owner.get(piglets.get(i).unwrap()))) {
-                
                 j += 1;
             }
 
@@ -397,7 +429,9 @@ impl Staking for Contract {
     }
 
     #[storage(read, write)]
-    fn unstake(pig: u64);
+    fn unstake(pig: u64) {
+
+    }
 
     #[storage(read, write)]
     fn claim_fees(pig: u64) {
@@ -405,5 +439,7 @@ impl Staking for Contract {
     }
 
     #[storage(read, write)]
-    fn set_fee_commission(pig: u64, commission: u64);
+    fn set_fee_commission(pig: u64, commission: u64) {
+
+    }
 }
