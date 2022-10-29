@@ -12,6 +12,7 @@
     "arweave-deploy": "yarn build && yarn export && arweave deploy-dir out --key-file arweave-wallet.json"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.3",
     "@heroicons/react": "^2.0.12",
     "fuels": "^0.17.0",
     "next": "13.0.0",
