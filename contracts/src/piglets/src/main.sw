@@ -9,7 +9,7 @@ use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError};
 use constants::{};
 use interface::{PigletNFT};
-use factory_interface::{NFT};
+use factory_interface::{PIG_ABI};
 use std::{
     chain::auth::msg_sender,
     identity::Identity,
@@ -252,7 +252,7 @@ impl PigletNFT for Contract {
         let pigs_to_mint = piglets.len()/storage.piglets_to_pigs_ratio;
         
         let factory_id: b256  = storage.factory.into();
-        let factory_contract  = abi(NFT, factory_id);
+        let factory_contract  = abi(PIG_ABI, factory_id);
         factory_contract.mint(pigs_to_mint, sender)
     }
 
