@@ -76,18 +76,15 @@ abi PigletNFT {
     ///
     /// # Arguments
     ///
-    /// * `access_control` - Determines whether only the admin can call the mint function.
-    /// * `admin` - The user which has the ability to mint if `access_control` is set to true and change the contract's admin.
+    /// * `admin` - The user which is admin
     /// * `piglet_minter` - The contract that has the ability to mint new piglet NFTs if the `admin` is null.
-    /// * `max_supply` - The maximum supply of tokens that can ever be minted.
     ///
     /// # Reverts
     ///
     /// * When the constructor function has already been called.
     /// * When the `token_supply` is set to 0.
-    /// * When `access_control` is set to true and no admin `Identity` was given.
     #[storage(read, write)]
-    fn constructor(access_control: bool, admin: Identity, piglet_minter: Identity, max_supply: u64);
+    fn constructor(admin: Identity, piglet_minter: Identity);
 
     /// Delegate the piglets of sender to a pig
     ///
@@ -127,10 +124,6 @@ abi PigletNFT {
     #[storage(read)]
     fn is_approved_for_all(operator: Identity, owner: Identity) -> bool;
 
-    /// Returns the total number of tokens which will ever be minted.
-    #[storage(read)]
-    fn max_supply() -> u64;
-
     /// Mints `amount` number of tokens to the `to` `Identity`.
     ///
     /// Once a token has been minted, it can be transfered and burned.
@@ -143,7 +136,6 @@ abi PigletNFT {
     /// # Reverts
     ///
     /// * When the minter is is not the trufflers Identity.
-    /// * When the sender is not the admin and `access_control` is set.
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity);
 
@@ -186,10 +178,15 @@ abi PigletNFT {
     #[storage(read)]
     fn owner_of(token_id: u64) -> Identity;
 
-    /// Changes the contract's admin.
+    /// Returns the current piglet minter for the contract.
     ///
-    /// This new admin will have access to minting if `access_control` is set to true and be able
-    /// to change the contract's admin to a new admin.
+    /// # Reverts
+    ///
+    /// * When the contract does not have a piglet minter.
+    #[storage(read)]
+    fn piglet_minter() -> Identity;
+
+    /// Changes the contract's admin.
     ///
     /// # Arguments
     ///
@@ -252,13 +249,4 @@ abi PigletNFT {
     /// * When the sender is not approved to transfer all tokens on the owner's behalf.
     #[storage(read, write)]
     fn transfer_from(from: Identity, to: Identity, token_id: u64);
-
-    
-    /// Returns the current piglet minter for the contract.
-    ///
-    /// # Reverts
-    ///
-    /// * When the contract does not have a piglet minter.
-    #[storage(read)]
-    fn piglet_minter() -> Identity;
 }
