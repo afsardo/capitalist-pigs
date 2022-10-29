@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "src/components/Button";
 import Select from "src/components/Select";
+import Card from "src/components/Card";
 
 const Coop = () => {
   return (
@@ -12,26 +13,35 @@ const Coop = () => {
           STAKE
         </button>
       </div> */}
-        <div className="flex flex-col w-full rounded-lg bg-gray-700 p-4 gap-4">
+        <Card className="flex flex-col w-full gap-4">
           <h6>Stake pig</h6>
-          <Select />
-          <Button
-            className="uppercase p-4 !bg-orange-700"
-            onClick={() => alert("TODO: STAKE")}
-          >
-            Stake
-          </Button>
-        </div>
-        <div className="flex flex-col w-full rounded-lg bg-gray-700 p-4 gap-4">
+          <p className="text-white/50">Start earning fees today...</p>
+          <div className="mt-auto w-full">
+            <Select className="mb-3" />
+            <Button
+              className="uppercase !bg-orange-700 w-full"
+              onClick={() => alert("TODO: STAKE")}
+            >
+              Stake
+            </Button>
+          </div>
+        </Card>
+        <Card className="flex flex-col w-full gap-4">
           <h6>Delegate piglet</h6>
-          <Select />
-          <Button
-            className="uppercase p-4"
-            onClick={() => alert("TODO: DELEGATE")}
-          >
-            Delegate
-          </Button>
-        </div>
+          <p className="text-white/50">
+            Delegate your piglet to an already staked pig and earn a % of the
+            accrued fees
+          </p>
+          <div className="mt-auto w-full">
+            <Select className="mb-3" />
+            <Button
+              className="uppercase w-full"
+              onClick={() => alert("TODO: DELEGATE")}
+            >
+              Delegate
+            </Button>
+          </div>
+        </Card>
       </div>
     </>
   );

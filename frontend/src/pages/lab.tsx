@@ -1,5 +1,7 @@
 import React from "react";
+
 import Button from "src/components/Button";
+import Card from "src/components/Card";
 
 const Lab = () => {
   return (
@@ -11,7 +13,7 @@ const Lab = () => {
           STAKE
         </button>
       </div> */}
-        <div className="flex flex-col w-full rounded-lg bg-gray-700 p-4 gap-4">
+        <Card className="flex flex-col w-full gap-4">
           <h6>Truffles</h6>
           <p className="text-white/50">
             Merchant is interested in swaping a smart pig for some tasteful
@@ -23,8 +25,8 @@ const Lab = () => {
           >
             Swap
           </Button>
-        </div>
-        <div className="flex flex-col w-full rounded-lg bg-gray-700 p-4 gap-4">
+        </Card>
+        <Card className="flex flex-col w-full gap-4">
           <h6>Piglets</h6>
           <p className="text-white/50">
             Mutate your piglets into a fat wealthy pig
@@ -35,7 +37,7 @@ const Lab = () => {
           >
             Mutate
           </Button>
-        </div>
+        </Card>
       </div>
     </>
   );
