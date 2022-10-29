@@ -5,12 +5,17 @@ dep constants;
 dep interface;
 dep data_structures;
 dep factory_interface;
+dep staking_interface;
+
+use interface::{PigletNFT};
+use factory_interface::{PigABI};
+use staking_interface::{StakingABI};
 
 use constants::{NULLSTRING};
 use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError};
-use interface::{PigletNFT};
-use factory_interface::{PIG_ABI};
+
+
 use std::{
     chain::auth::msg_sender,
     constants::{
@@ -29,6 +34,7 @@ storage {
     admin: Option<Identity> = Option::None,
     piglet_minter: Option<Identity> = Option::None,
     factory: ContractId = ~ContractId::from(0x0000000000000000000000000000000000000000000000000000000000000000),
+    staking_factory: ContractId = ~ContractId::from(0x0000000000000000000000000000000000000000000000000000000000000000),
     approved: StorageMap<u64, Option<Identity>> = StorageMap {},
     balances: StorageMap<Identity, u64> = StorageMap {},
     meta_data: StorageMap<u64, TokenMetaData> = StorageMap {},
@@ -70,11 +76,19 @@ fn burn(token_id: u64, owner: Identity) {
     storage.total_supply -= 1;
 }
 
+#[storage(read)]
+fn validate_if_piglets_belong_to_sender(owner: Identity, piglets: Vec<u64>) {
+    storage.owners.insert(token_id, Option::None());
+    remove_piglet_from_owner_map(owner, token_id);
+    storage.total_supply -= 1;
+}
+
 ///
 impl PigletNFT for Contract {
     #[storage(read, write)]
     fn constructor(
         factory: ContractId,
+        staking_factory: ContractId,
         admin: Identity,
         piglet_minter: Identity,
         piglets_to_pigs_ratio: u64,
@@ -84,12 +98,14 @@ impl PigletNFT for Contract {
 
         require(storage.piglet_minter.is_some(), InitError::CannotReinitialize);
         require(factory != BASE_ASSET_ID, InitError::InvalidFactory);
+        require(staking_factory != BASE_ASSET_ID, InitError::InvalidFactory);
         require(admin.is_some(), InitError::AdminIsNone);
         require(piglet_minter.is_some(), InitError::PigletMinterIsNone);
         require(piglets_to_pigs_ratio > 0 , InitError::PigletsToPigRatioCannotBeZero);
 
         storage.admin = admin;
         storage.factory = factory;
+        storage.staking_factory = staking_factory;
         storage.piglet_minter = piglet_minter;
         storage.piglets_to_pigs_ratio = piglets_to_pigs_ratio;
     }
@@ -140,6 +156,11 @@ impl PigletNFT for Contract {
     #[storage(read)]
     fn get_factory() -> ContractId {
         return storage.factory;
+    }
+
+    #[storage(read)]
+    fn get_staking_factory() -> ContractId {
+        return storage.staking_factory;
     }
 
     #[storage(read)]
@@ -206,6 +227,11 @@ impl PigletNFT for Contract {
     #[storage(read, write)]
     fn delegate(pig: u64, piglets: Vec<u64>) {
         let sender = msg_sender().unwrap();
+        
+        let staking_id: b256 = storage.factory.into();
+        let staking_contract = abi(StakingABI, staking_id);
+        
+        staking_contract.delegate(sender, pig, piglets);
     }
 
     #[storage(read, write)]
@@ -236,13 +262,14 @@ impl PigletNFT for Contract {
         // validate pigslets len > 1
         require(piglets.len() > 0, InputError::InvalidTokenSize);
 
-                // validate if piglets >= piglets_to_pig_conversation 
+        // validate if piglets >= piglets_to_pig_conversation 
         require(piglets.len() > storage.piglets_to_pigs_ratio, InputError::NotEnoughPiglets);
 
-                // validate if piglets len is a common divisor of piglets_to_pigs_ratio
+        // validate if piglets len is a common divisor of piglets_to_pigs_ratio
         require(piglets.len() % storage.piglets_to_pigs_ratio == 0, InputError::InvalidNumberOfPiglets);
 
-                // validate if all piglets exists + if piglet belongs to sender
+        // validate if all piglets exists + if piglet belongs to sender
+        validate_if_piglets_belong_to_sender(sender, piglets);
         let mut index = 0;
         while index < piglets.len() {
             let token_id = piglets.get(index).unwrap();
@@ -255,10 +282,10 @@ impl PigletNFT for Contract {
         let pigs_to_mint = piglets.len() / storage.piglets_to_pigs_ratio;
 
         let factory_id: b256 = storage.factory.into();
-        let factory_contract = abi(PIG_ABI, factory_id);
+        let factory_contract = abi(PigABI, factory_id);
         factory_contract.mint(pigs_to_mint, sender);
 
-        index = 0;
+        let mut index = 0;
         while index < piglets.len() {
             let token_id = piglets.get(index).unwrap();
             burn(token_id, sender);

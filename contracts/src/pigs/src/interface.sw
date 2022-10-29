@@ -6,6 +6,8 @@ use data_structures::TokenMetaData;
 use std::{identity::Identity};
 
 abi Pigs {
+    #[storage(read, write)]
+    fn gg(puta_madre: Identity) -> u64;
     /// Returns the current admin for the contract
     ///
     /// # Reverts

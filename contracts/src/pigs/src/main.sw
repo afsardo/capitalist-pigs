@@ -228,6 +228,11 @@ impl Pigs for Contract {
     }
 
     #[storage(read, write)]
+    fn gg(puta_madre: Identity) -> u64 {
+        return 1
+    }
+
+    #[storage(read, write)]
     fn mint(amount: u64, to: Identity) {
         let tokens_minted = storage.tokens_minted;
         let total_mint = tokens_minted + amount;

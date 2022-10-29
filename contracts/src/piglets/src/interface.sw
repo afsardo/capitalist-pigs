@@ -1,5 +1,7 @@
 library interface;
+
 dep data_structures;
+
 use data_structures::TokenMetaData;
 use std::{
     identity::Identity,
@@ -82,7 +84,7 @@ abi PigletNFT {
     /// * When the constructor function has already been called.
     /// * When the `token_supply` is set to 0.
     #[storage(read, write)]
-    fn constructor(factory: ContractId, admin: Identity, piglet_minter: Identity, piglets_to_pigs_ratio: u64);
+    fn constructor(staking_factory: ContractId, factory: ContractId, admin: Identity, piglet_minter: Identity, piglets_to_pigs_ratio: u64);
     /// Delegate the piglets of sender to a pig
     ///
     /// # Arguments
@@ -132,6 +134,7 @@ abi PigletNFT {
     /// * When the minter is is not the trufflers Identity.
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity);
+    
     /// Mints Pigs based on the amount of piglets given
     /// Once a Pig token has been minted, it gets transfered to the sender and piglets get burned
     ///
@@ -174,6 +177,10 @@ abi PigletNFT {
     /// Returns the factory contract.
     #[storage(read)]
     fn get_factory() -> ContractId;
+
+    /// Returns the staking factory contract.
+    #[storage(read)]
+    fn get_staking_factory() -> ContractId;
 
     /// Returns the piglet minter for the contract.
     #[storage(read)]

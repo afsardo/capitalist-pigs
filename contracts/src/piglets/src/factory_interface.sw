@@ -2,7 +2,7 @@ library factory_interface;
 dep data_structures;
 use data_structures::TokenMetaData;
 use std::{identity::Identity, vec::Vec};
-abi PIG_ABI {
+abi PigABI {
     /// Returns the current admin for the contract.
     ///
     /// # Reverts
