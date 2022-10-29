@@ -3,7 +3,7 @@ library interface;
 dep data_structures;
 
 use data_structures::TokenMetaData;
-use std::{identity::Identity, option::Option};
+use std::{identity::Identity, vec::Vec};
 
 abi NFT {
     /// Returns the current admin for the contract.
@@ -60,6 +60,14 @@ abi NFT {
     /// * `owner` - The user of which the balance should be returned.
     #[storage(read)]
     fn balance_of(owner: Identity) -> u64;
+
+    /// Returns the whole array of pigs that a user holds.
+    ///
+    /// # Arguments
+    ///
+    /// * `owner` - The owner for which we return the whole array of pigs they currently hold
+    #[storage(read)]
+    fn pigs(owner: Identity) -> Vec<u64>;
 
     /// Burns the specified token.
     ///

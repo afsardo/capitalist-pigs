@@ -10,8 +10,9 @@ use errors::{AccessError, InitError, InputError, InflationError};
 use interface::{NFT};
 use constants::{THOUSAND, YEAR, ONE};
 use std::{
-    chain::auth::msg_sender,
+    chain::auth::*,
     identity::Identity,
+    context::{*, call_frames::*},
     contract_id::ContractId,
     logging::log,
     option::Option,
@@ -56,6 +57,9 @@ storage {
     /// If the token has been burned then `None` will be stored.
     /// Map(token_id => owner)
     owners: StorageMap<u64, Option<Identity>> = StorageMap {},
+    /// Stores the array of pigs that a user holds
+    /// Map (owner => pig_array)
+    pigs: StorageMap<Identity, Vec<u64>> = StorageMap {}, // NOT recommended in prod
     /// The total number of tokens that ever have been minted.
     /// This is used to assign token identifiers when minting. This will only be incremented.
     tokens_minted: u64 = 0,
@@ -73,11 +77,28 @@ storage {
     snapshotted_supply: u64 = 0
 }
 
+///////////////////
+// Internal Methods
+///////////////////
+#[storage(read, write)]fn add_pig(owner: Identity, pig: u64) {
+    storage.pigs.get(owner).push(pig);
+}
+
+#[storage(read, write)]fn remove_pig(owner: Identity, pig: u64) {
+    let i: u64 = 0;
+    let owned_pigs: Vec<u64> = storage.pigs.get(owner);
+
+    while (i < owned_pigs.len()) {
+        if (owned_pigs.get(i).unwrap() == pig) {
+            storage.pigs.get(owner).remove(i);
+            break;
+        }
+    }
+}
+
 impl NFT for Contract {
     #[storage(read)]
     fn admin() -> Identity {
-        // TODO: Remove this and update function definition to include Option once
-        // https://github.com/FuelLabs/fuels-rs/issues/415 is revolved
         let admin = storage.admin;
         require(admin.is_some(), InputError::AdminDoesNotExist);
         admin.unwrap()
@@ -85,8 +106,6 @@ impl NFT for Contract {
 
     #[storage(read)]
     fn piglet_transformer() -> Identity {
-        // TODO: Remove this and update function definition to include Option once
-        // https://github.com/FuelLabs/fuels-rs/issues/415 is revolved
         let piglet_transformer = storage.piglet_transformer;
         require(piglet_transformer.is_some(), InputError::PigletTransformerDoesNotExist);
         piglet_transformer.unwrap()
@@ -94,9 +113,6 @@ impl NFT for Contract {
 
     #[storage(read, write)]
     fn approve(approved: Identity, token_id: u64) {
-        // Ensure this is a valid token
-        // TODO: Remove this and update function definition to include Option once
-        // https://github.com/FuelLabs/fuels-rs/issues/415 is revolved
         let approved = Option::Some(approved);
         let token_owner = storage.owners.get(token_id);
         require(token_owner.is_some(), InputError::TokenDoesNotExist);
@@ -134,6 +150,7 @@ impl NFT for Contract {
         let sender = msg_sender().unwrap();
         require(token_owner.unwrap() == sender, AccessError::SenderNotOwner);
 
+        remove_pig(token_owner.unwrap(), token_id);
         storage.owners.insert(token_id, Option::None());
         storage.balances.insert(sender, storage.balances.get(sender) - 1);
         storage.total_supply -= 1;
@@ -183,6 +200,11 @@ impl NFT for Contract {
         storage.max_supply
     }
 
+    #[storage(read)]
+    fn pigs(owner: Identity) -> Vec<u64> {
+        storage.pigs.get(owner)
+    }
+
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity) {
         let tokens_minted = storage.tokens_minted;
@@ -198,12 +220,14 @@ impl NFT for Contract {
             require(inflation_allowed_max_supply >= total_mint, InflationError::MintExceedsInflation);
         }
 
-        // Ensure that the sender is the admin if this is a controlled access mint or the piglet_transformer if the admin is null
-        let admin              = storage.admin;
-        let piglet_transformer = storage.piglet_transformer;
+        // Ensure that the sender is the admin if this is a controlled access mint or the `piglet_transformer` if the admin is this contract
+        let admin                               = storage.admin;
+        let piglet_transformer                  = storage.piglet_transformer;
+        let caller: Result<Identity, AuthError> = msg_sender();
+
         require(
           (!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap())) ||
-          (!admin.is_some() && piglet_transformer.is_some() && msg_sender().unwrap() == piglet_transformer.unwrap()),
+          (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()),
           AccessError::SenderNotAdminOrPigletTransformer
         );
 
@@ -213,6 +237,7 @@ impl NFT for Contract {
             // Create the TokenMetaData for this new token
             storage.meta_data.insert(index, ~TokenMetaData::new());
             storage.owners.insert(index, Option::Some(to));
+            add_pig(to, index);
             index += 1;
         }
 
@@ -240,8 +265,6 @@ impl NFT for Contract {
     #[storage(read, write)]
     fn set_admin(admin: Identity) {
         // Ensure that the sender is the admin
-        // TODO: Remove this and update function definition to include Option once
-        // https://github.com/FuelLabs/fuels-rs/issues/415 is revolved
         let current_admin = storage.admin;
         require(current_admin.is_some() && msg_sender().unwrap() == current_admin.unwrap(), AccessError::SenderCannotSetAccessControl);
         storage.admin = Option::Some(admin);
@@ -250,11 +273,8 @@ impl NFT for Contract {
 
     #[storage(read, write)]
     fn set_piglet_transformer(piglet_transformer: Identity) {
-        // Ensure that the sender is the piglet_transformer
-        // TODO: Remove this and update function definition to include Option once
-        // https://github.com/FuelLabs/fuels-rs/issues/415 is revolved
         let current_admin              = storage.admin;
-        let piglet_transformer         = Option::Some(piglet_transformer);
+        let new_piglet_transformer     = Option::Some(piglet_transformer);
         let current_piglet_transformer = storage.piglet_transformer;
 
         require(
@@ -262,7 +282,7 @@ impl NFT for Contract {
           (current_admin.is_some() && msg_sender().unwrap() == current_admin.unwrap()),
           AccessError::SenderCannotSetPigletTransformer
         );
-        storage.piglet_transformer = piglet_transformer;
+        storage.piglet_transformer = new_piglet_transformer;
     }
 
     #[storage(read, write)]
@@ -297,6 +317,9 @@ impl NFT for Contract {
         if approved.is_some() {
             storage.approved.insert(token_id, Option::None());
         }
+
+        remove_pig(from, token_id);
+        add_pig(to, token_id);
 
         storage.balances.insert(from, storage.balances.get(from) - 1);
         storage.balances.insert(to, storage.balances.get(to) + 1);
