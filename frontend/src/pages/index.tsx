@@ -33,26 +33,26 @@ export default function Home() {
 
         <section className="h-screen grid place-items-center text-center hide">
           <div>
-            <h4 className="mb-20">
+            <h4 className="mb-20 text-2xl">
               The whole proccess is pretty straight-forward
             </h4>
             <div className="flex items-center gap-5">
               <div className="rounded-lg bg-gray-700 p-4">
                 <Image src="/pig.jpeg" alt="lab" width={200} height={200} />
               </div>
-              <p className="font-bold uppercase">
+              <p className="font-bold">
                 Adquire a <span className="fancy-text">PIG</span>
               </p>
             </div>
           </div>
         </section>
-        <section className="h-screen grid place-items-center text-center hide">
-          <div className="flex flex-col justify-center gap-16">
-            <div>
+        <section className="h-screen grid place-items-center text-center">
+          <div className="flex flex-col h-full max-h-72 justify-between max-w-xl w-full">
+            <div className="text-left text-2xl hide">
               <span className="fancy-text">Stake</span> your pig to{" "}
-              <span className="fancy-text-2 font-bold">receive fees</span>!
+              <span className="fancy-text-2 font-bold">receive fees...</span>
             </div>
-            <div>
+            <div className="text-right text-2xl hide">
               <span className="fancy-text-2">Hold</span> your pig to{" "}
               <span className="fancy-text font-bold">generate mucus!</span>
             </div>
