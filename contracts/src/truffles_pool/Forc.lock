@@ -8,6 +8,6 @@ source = 'git+https://github.com/fuellabs/sway?tag=v0.28.1#84f9aad376760cd9c8eac
 dependencies = ['core']
 
 [[package]]
-name = 'truffles'
+name = 'truffles_pool'
 source = 'root'
 dependencies = ['std']

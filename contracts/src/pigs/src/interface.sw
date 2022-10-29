@@ -5,7 +5,7 @@ dep data_structures;
 use data_structures::TokenMetaData;
 use std::{identity::Identity, vec::Vec};
 
-abi NFT {
+abi Pig {
     /// Returns the current admin for the contract.
     ///
     /// # Reverts

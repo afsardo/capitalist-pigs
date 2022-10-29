@@ -9,17 +9,18 @@ use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError, InflationError};
 use interface::{NFT};
 use constants::{THOUSAND, YEAR, ONE};
+
 use std::{
-    chain::auth::*,
-    identity::Identity,
-    context::{*, call_frames::*},
-    contract_id::ContractId,
     logging::log,
+    chain::auth::*,
     option::Option,
     result::Result,
-    revert::{require, revert},
-    storage::StorageMap,
     block::timestamp,
+    identity::Identity,
+    storage::StorageMap,
+    contract_id::ContractId,
+    revert::{require, revert},
+    context::{*, call_frames::*},
     constants::{ZERO_B256, BASE_ASSET_ID}
 };
 
@@ -96,7 +97,7 @@ storage {
     }
 }
 
-impl NFT for Contract {
+impl Pig for Contract {
     #[storage(read)]
     fn admin() -> Identity {
         let admin = storage.admin;
@@ -213,7 +214,7 @@ impl NFT for Contract {
         // The current number of tokens minted plus the amount to be minted cannot be
         // greater than the total supply or the current allowed amount according to the `inflation_rate`
         let elapsed_time: u64 = (timestamp() - storage.inflation_start_time);
-        let inflation_allowed_max_supply: u64 = storage.snapshotted_supply * (ONE + storage.inflation_rate * (elapsed_time / storage.inflation_epoch));
+        let inflation_allowed_max_supply: u64 = storage.snapshotted_supply * (THOUSAND + storage.inflation_rate * (elapsed_time / storage.inflation_epoch)) / THOUSAND;
 
         require(storage.max_supply >= total_mint, InputError::NotEnoughTokensToMint);
         if (storage.snapshotted_supply > 0 && inflation_allowed_max_supply > 0) {

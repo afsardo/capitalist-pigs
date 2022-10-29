@@ -5,3 +5,7 @@ license = "Apache-2.0"
 name = "staking"
 
 [dependencies]
+piglets_abi         = { path = "../piglets" }
+truffles_abi        = { path = "../truffles" }
+fee_token_abi       = { path = "../fee-token" }
+fee_distributor_abi = { path = "../fee_distributor" }

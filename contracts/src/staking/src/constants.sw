@@ -1,3 +1,3 @@
 library constants;
 
-pub const MAX_DELEGATEES: u64 = 10;
+pub const MAX_DELEGATORS: u64 = 10;
