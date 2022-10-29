@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { Disclosure } from "@headlessui/react";
-
+import { Wallet } from "fuels";
 import {
   BanknotesIcon,
   BeakerIcon,
@@ -11,6 +11,83 @@ import {
   HomeModernIcon,
 } from "@heroicons/react/24/solid";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+
+import Modal from "./Modal";
+import Button from "./Button";
+import { formatWalletAddress } from "src/utils";
+
+const WalletWidget = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [walletAddress, setWalletAddress] = useLocalStorage<null | string>(
+    "key",
+    null
+  );
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const generateWallet = async () => {
+    const res = await Wallet.generate();
+    setWalletAddress(res.privateKey);
+    setIsOpen(false);
+  };
+
+  const submit = () => {
+    if (inputRef.current) {
+      setWalletAddress(inputRef.current.value);
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="text-ellipsis overflow-hidden w-[200px] border border-yellow-400 px-3 py-1 rounded-full"
+      >
+        {walletAddress ? formatWalletAddress(walletAddress) : "Connect"}
+      </button>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Wallet">
+        <div className="flex mb-8 gap-2 text-black">
+          {walletAddress ? (
+            <div>Private key: {formatWalletAddress(walletAddress)}</div>
+          ) : (
+            <>
+              <input
+                ref={inputRef}
+                placeholder="Private Key"
+                className="px-2"
+              />
+              <button className="bg-white text-black px-2" onClick={submit}>
+                Submit
+              </button>
+            </>
+          )}
+        </div>
+        <div className="flex gap-4">
+          <Button
+            className="rounded-full py-2 text-sm"
+            onClick={generateWallet}
+          >
+            Generate Address
+          </Button>
+          <Button
+            className={`rounded-full py-2 text-sm ${
+              walletAddress === ""
+                ? "opacity-30 cursor-auto pointer-events-none"
+                : ""
+            }`}
+            onClick={() => {
+              setWalletAddress("");
+              setIsOpen(false);
+            }}
+          >
+            Disconnect
+          </Button>
+        </div>
+      </Modal>
+    </>
+  );
+};
 
 const routes = [
   { href: "/", label: "Home", icon: <BanknotesIcon className="h-6 w-6" /> },
@@ -33,18 +110,6 @@ const routes = [
 
 export default function Navbar() {
   const router = useRouter();
-  const [newKey, setNewKey] = useState("");
-  const [key, setKey] = useLocalStorage<null | string>("key", null);
-
-  const saveNewKey = () => {
-    // TODO: query contract for airdrop
-    setKey(newKey);
-    setNewKey("");
-  };
-
-  const removeKey = () => {
-    setKey(null);
-  };
 
   return (
     <Disclosure
@@ -88,31 +153,7 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="flex flex-1 justify-center px-2 lg:ml-6 lg:justify-end">
-                  <div className="w-full max-w-lg lg:max-w-xs">
-                    {!key ? (
-                      <form onSubmit={saveNewKey}>
-                        <input
-                          className="mr-3 text-black"
-                          value={newKey}
-                          placeholder="private key"
-                          onChange={(e) => setNewKey(e.target.value)}
-                        />
-                        <button className="bg-white text-black px-2 border rounded pointer">
-                          ✓
-                        </button>
-                      </form>
-                    ) : (
-                      <div>
-                        <div>{key}</div>
-                        <button
-                          className="bg-white text-black px-2 border rounded pointer"
-                          onClick={removeKey}
-                        >
-                          x
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <WalletWidget />
                 </div>
                 <div className="flex lg:hidden">
                   {/* Mobile menu button */}

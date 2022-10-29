@@ -74,10 +74,8 @@ abi PigletNFT {
     ///
     /// # Arguments
     ///
-    /// * `factory` - The original contract that generates this contract
     /// * `admin` - The user which is admin
     /// * `piglet_minter` - The contract that has the ability to mint new piglet NFTs if the `admin` is null.
-    /// * `piglets_to_pigs_ratio` - the ratio at which X piglets will convert into a pig
     ///
     /// # Reverts
     ///
@@ -150,7 +148,17 @@ abi PigletNFT {
     /// * When the Pig Contract fails
     #[storage(read, write)]
     fn mintPigs(piglets: Vec<u64>);
-
+    /// Returns the metadata for the token specified
+    ///
+    /// # Arguments
+    ///
+    /// * `token_id` - The unique identifier of the token.
+    ///
+    /// # Reverts
+    ///
+    /// * When the `token_id` does not map to an exsiting token.
+    #[storage(read)]
+    fn meta_data(token_id: u64) -> TokenMetaData;
     /// Returns the user which owns the specified token.
     ///
     /// # Arguments

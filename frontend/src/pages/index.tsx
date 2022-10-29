@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect } from "react";
 
@@ -98,7 +97,7 @@ export default function Home() {
               Stop being a peasant today... be a part of the Capitalist Pigs
             </p>
             <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest animate-bounce">
-              BUY
+              CLAIM
             </button>
           </div>
         </section>
