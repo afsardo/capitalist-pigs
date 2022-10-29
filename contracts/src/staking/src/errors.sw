@@ -9,3 +9,7 @@ pub enum InitError {
     InvalidFeesPerSecond: (),
     InvalidTrufflesPerSecond: ()
 }
+
+pub enum InputError {
+    IndexExceedsArrayLength: ()
+}

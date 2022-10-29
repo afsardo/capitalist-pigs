@@ -18,7 +18,6 @@ abi PigletNFT {
     #[storage(read)]
     fn admin() -> Identity;
 
-
     /// Gives approval to the `approved` user to transfer a specific token on another user's behalf.
     ///
     /// To revoke approval the approved user should be `None`.
@@ -266,4 +265,15 @@ abi PigletNFT {
     /// * When the sender is not approved to transfer all tokens on the owner's behalf.
     #[storage(read, write)]
     fn transfer_from(from: Identity, to: Identity, token_id: u64);
+<<<<<<< HEAD
+=======
+
+    /// Returns the current piglet minter for the contract.
+    ///
+    /// # Reverts
+    ///
+    /// * When the contract does not have a piglet minter.
+    #[storage(read)]
+    fn piglet_minter() -> Identity;
+>>>>>>> b0c50ee (Start to code getters for staking contract)
 }
