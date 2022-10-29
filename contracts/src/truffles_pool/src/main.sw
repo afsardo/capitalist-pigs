@@ -1,11 +1,17 @@
 contract;
 
+dep data_structures;
+dep interface;
+
 use std::{
     address::*,
     assert::assert,
     block::*,
     chain::auth::*,
-    context::{*, call_frames::*},
+    context::{
+        *,
+        call_frames::*,
+    },
     contract_id::ContractId,
     hash::*,
     result::*,
@@ -15,13 +21,29 @@ use std::{
     u128::U128,
 };
 
-use truffle_exchange_abi::{TruffleExchange, PoolInfo, PositionInfo, PreviewInfo, RemoveLiquidityInfo, PreviewAddLiquidityInfo};
-use truffle_exchange_helpers::get_msg_sender_address_or_panic;
+use data_structures::{
+    PoolInfo,
+    PositionInfo,
+    PreviewAddLiquidityInfo,
+    PreviewInfo,
+    RemoveLiquidityInfo,
+};
+
+use interface::{TrufflesPool};
+
+/// Return the sender as an Address or panic
+fn get_msg_sender_address_or_panic() -> Address {
+    let sender: Result<Identity, AuthError> = msg_sender();
+    if let Identity::Address(address) = sender.unwrap() {
+        address
+    } else {
+        revert(0);
+    }
+}
 
 ////////////////////////////////////////
 // Constants
 ////////////////////////////////////////
-
 /// Token ID of Ether
 const ETH_ID = 0x0000000000000000000000000000000000000000000000000000000000000000;
 
@@ -38,7 +60,6 @@ const LIQUIDITY_MINER_FEE = 333;
 ////////////////////////////////////////
 // Storage declarations
 ////////////////////////////////////////
-
 storage {
     lp_truffle_supply: u64 = 0,
     deposits: StorageMap<(Address, ContractId), u64> = StorageMap {},
@@ -47,7 +68,6 @@ storage {
 ////////////////////////////////////////
 // Helper functions
 ////////////////////////////////////////
-
 /// Return token reserve balance
 #[storage(read)]
 fn get_current_reserve(token_id: b256) -> u64 {
@@ -79,7 +99,8 @@ fn mutiply_div(a: u64, b: u64, c: u64) -> u64 {
 
     // TODO remove workaround once https://github.com/FuelLabs/sway/pull/1671 lands.
     match result_wrapped {
-        Result::Ok(inner_value) => inner_value, _ => revert(0), 
+        Result::Ok(inner_value) => inner_value,
+        _ => revert(0),
     }
 }
 
@@ -89,7 +110,8 @@ fn div_mutiply(a: u64, b: u64, c: u64) -> u64 {
 
     // TODO remove workaround once https://github.com/FuelLabs/sway/pull/1671 lands.
     match result_wrapped {
-        Result::Ok(inner_value) => inner_value, _ => revert(0), 
+        Result::Ok(inner_value) => inner_value,
+        _ => revert(0),
     }
 }
 
@@ -102,7 +124,8 @@ fn get_input_price(input_amount: u64, input_reserve: u64, output_reserve: u64) -
     let result_wrapped = (numerator / denominator).as_u64();
     // TODO remove workaround once https://github.com/FuelLabs/sway/pull/1671 lands.
     match result_wrapped {
-        Result::Ok(inner_value) => inner_value, _ => revert(0), 
+        Result::Ok(inner_value) => inner_value,
+        _ => revert(0),
     }
 }
 
@@ -118,7 +141,8 @@ fn get_output_price(output_amount: u64, input_reserve: u64, output_reserve: u64)
     } else {
         // TODO remove workaround once https://github.com/FuelLabs/sway/pull/1671 lands.
         match result_wrapped {
-            Result::Ok(inner_value) => inner_value + 1, _ => revert(0), 
+            Result::Ok(inner_value) => inner_value + 1,
+            _ => revert(0),
         }
     }
 }
@@ -126,7 +150,7 @@ fn get_output_price(output_amount: u64, input_reserve: u64, output_reserve: u64)
 // ////////////////////////////////////////
 // // ABI definitions
 // ////////////////////////////////////////
-impl TruffleExchange for Contract {
+impl TrufflesPool for Contract {
     #[storage(read)]
     fn get_balance(asset_id: ContractId) -> u64 {
         let sender = get_msg_sender_address_or_panic();
@@ -155,7 +179,7 @@ impl TruffleExchange for Contract {
             eth_reserve: eth_reserve,
             truffle_reserve: truffle_reserve,
             eth_amount: eth_amount,
-            truffle_amount: truffle_amount
+            truffle_amount: truffle_amount,
         }
     }
 
@@ -168,7 +192,7 @@ impl TruffleExchange for Contract {
         let mut current_eth_amount = amount;
         let mut lp_truffle_received = 0;
         let mut truffle_amount = 0;
-  
+
         if (asset_id == token_id) {
             current_eth_amount = mutiply_div(amount, eth_reserve, truffle_reserve);
         }
@@ -282,7 +306,6 @@ impl TruffleExchange for Contract {
 
             minted = initial_liquidity;
         };
-
         // Clear user contract balances after finishing add/create liquidity
         storage.deposits.insert((sender, ~ContractId::from(get::<b256>(TOKEN_ID_KEY))), 0);
         storage.deposits.insert((sender, ~ContractId::from(ETH_ID)), 0);
