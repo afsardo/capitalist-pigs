@@ -1,9 +1,5 @@
 import React from "react";
-import Image from "next/image";
-
 import Button from "src/components/Button";
-import Heading from "src/components/Heading";
-import Select from "src/components/Select";
 
 const Lab = () => {
   return (

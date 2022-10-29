@@ -1,5 +1,9 @@
 import React from "react";
-import DashboardPage from "src/components/DashboardPage";
+import dynamic from "next/dynamic";
+
+const DashboardPage = dynamic(() => import("../components/DashboardPage"), {
+  ssr: false,
+});
 
 const Dashboard = () => {
   return (

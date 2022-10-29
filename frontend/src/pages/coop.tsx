@@ -1,6 +1,4 @@
 import React from "react";
-import Image from "next/image";
-
 import Button from "src/components/Button";
 import Select from "src/components/Select";
 

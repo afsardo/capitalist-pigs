@@ -6,7 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  assetPrefix: './'
+  // TEMP: Arweave deployment requires assetPrefix: '.'
+  // assetPrefix: './'
 };
 
 module.exports = nextConfig;

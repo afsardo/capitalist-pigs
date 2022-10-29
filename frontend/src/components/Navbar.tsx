@@ -34,7 +34,7 @@ const routes = [
 export default function Navbar() {
   const router = useRouter();
   const [newKey, setNewKey] = useState("");
-  const [key, setKey] = useLocalStorage("key", null);
+  const [key, setKey] = useLocalStorage<null | string>("key", null);
 
   const saveNewKey = () => {
     // TODO: query contract for airdrop
