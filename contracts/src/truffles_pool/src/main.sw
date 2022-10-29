@@ -41,9 +41,9 @@ fn get_msg_sender_address_or_panic() -> Address {
     }
 }
 
-////////////////////////////////////////
+////////////
 // Constants
-////////////////////////////////////////
+////////////
 /// Token ID of Ether
 const ETH_ID = 0x0000000000000000000000000000000000000000000000000000000000000000;
 
@@ -57,31 +57,31 @@ const MINIMUM_LIQUIDITY = 1; //A more realistic value would be 1000000000;
 // Liquidity miner fee apply to all swaps
 const LIQUIDITY_MINER_FEE = 333;
 
-////////////////////////////////////////
-// Storage declarations
-////////////////////////////////////////
+///////////////////////
+// Storage Declarations
+///////////////////////
 storage {
     lp_truffle_supply: u64 = 0,
     deposits: StorageMap<(Address, ContractId), u64> = StorageMap {},
 }
 
-////////////////////////////////////////
-// Helper functions
-////////////////////////////////////////
+///////////////////
+// Helper Functions
+///////////////////
 /// Return token reserve balance
 #[storage(read)]
 fn get_current_reserve(token_id: b256) -> u64 {
     get::<u64>(token_id)
 }
 
-/// Add amount to the token reserve
+/// Add an amount to the token reserve
 #[storage(read, write)]
 fn add_reserve(token_id: b256, amount: u64) {
     let value = get::<u64>(token_id);
     store(token_id, value + amount);
 }
 
-/// Remove amount to the token reserve
+/// Remove an amount from the token reserve
 #[storage(read, write)]
 fn remove_reserve(token_id: b256, amount: u64) {
     let value = get::<u64>(token_id);
@@ -147,9 +147,9 @@ fn get_output_price(output_amount: u64, input_reserve: u64, output_reserve: u64)
     }
 }
 
-// ////////////////////////////////////////
-// // ABI definitions
-// ////////////////////////////////////////
+//////////////////
+// ABI Definitions
+//////////////////
 impl TrufflesPool for Contract {
     #[storage(read)]
     fn get_balance(asset_id: ContractId) -> u64 {

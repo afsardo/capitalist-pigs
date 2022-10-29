@@ -7,8 +7,8 @@ dep constants;
 
 use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError, InflationError};
-use interface::{NFT};
-use constants::{THOUSAND, YEAR, ONE};
+use interface::{Pigs};
+use constants::{THOUSAND, YEAR};
 
 use std::{
     logging::log,
@@ -97,7 +97,7 @@ storage {
     }
 }
 
-impl Pig for Contract {
+impl Pigs for Contract {
     #[storage(read)]
     fn admin() -> Identity {
         let admin = storage.admin;
@@ -202,8 +202,10 @@ impl Pig for Contract {
     }
 
     #[storage(read)]
-    fn pigs(owner: Identity) -> Vec<u64> {
-        storage.pigs.get(owner)
+    fn pigs(owner: Identity, index: u64) -> u64 {
+        let all_pigs = storage.pigs.get(owner);
+        require(index < all_pigs.len(), InputError::IndexExceedsArrayLength);
+        all_pigs.get(index).unwrap()
     }
 
     #[storage(read, write)]
