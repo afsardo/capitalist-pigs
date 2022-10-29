@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useLocalStorage from "hooks/useLocalStorage";
-import { Disclosure } from '@headlessui/react'
+import { Disclosure } from "@headlessui/react";
 
 import {
   BanknotesIcon,
@@ -10,7 +10,7 @@ import {
   ChartBarIcon,
   HomeModernIcon,
 } from "@heroicons/react/24/solid";
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const routes = [
   { href: "/", label: "Home", icon: <BanknotesIcon className="h-6 w-6" /> },
@@ -32,7 +32,7 @@ const routes = [
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Example() {
@@ -51,82 +51,119 @@ export default function Example() {
   };
 
   return (
-    <Disclosure as="nav" className="fixed w-full h-[60px] bg-transparent backdrop-blur-sm border-b border-white/10 z-30">
-      {({ open }) => (
-        <>
-          <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
-            <div className="relative flex h-16 items-center justify-between">
-              <div className="flex items-center px-2 lg:px-0">
-                <div className="hidden lg:ml-6 lg:block">
-                  <ul className="flex justify-center gap-5 text-xl">
-                    {routes.map((route) => (
-                      <li key={route.href}>
-                        <Link
-                          className={`flex items-center ${
-                            router.pathname === route.href ? "rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" : "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                          }`}
-                          href={route.href}
-                        >
-                          {route.icon}
-                          <div className="ml-2">{route.label}</div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+    <Disclosure
+      as="nav"
+      className="w-full h-[60px] bg-transparent backdrop-blur-sm border-b border-white/10 z-30 fixed inset-0 bottom-auto"
+    >
+      {({ open, close }) => {
+        return (
+          <>
+            <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
+              <div className="relative flex h-16 items-center justify-between">
+                <div className="flex items-center px-2 lg:px-0">
+                  <div className="hidden lg:ml-6 lg:block">
+                    <ul className="flex justify-center gap-5 text-xl">
+                      {routes.map((route) => {
+                        const isActive = router.pathname === route.href;
+
+                        return (
+                          <li key={route.href}>
+                            <Link
+                              className={`flex items-center ${
+                                isActive
+                                  ? "rounded-md px-3 py-2 text-sm font-medium text-purple-700"
+                                  : "rounded-md px-3 py-2 text-sm font-medium text-white/30 hover:text-white"
+                              }`}
+                              href={route.href}
+                            >
+                              {route.icon}
+                              <div
+                                className={
+                                  isActive ? `ml-2 fancy-text` : "ml-2"
+                                }
+                              >
+                                {route.label}
+                              </div>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-1 justify-center px-2 lg:ml-6 lg:justify-end">
-                <div className="w-full max-w-lg lg:max-w-xs">
-                  {
-                    !key ? (
+                <div className="flex flex-1 justify-center px-2 lg:ml-6 lg:justify-end">
+                  <div className="w-full max-w-lg lg:max-w-xs">
+                    {!key ? (
                       <form onSubmit={saveNewKey}>
-                        <input className="mr-3 text-black" value={newKey} placeholder="private key" onChange={(e) => setNewKey(e.target.value)} />
-                        <button className="bg-white text-black px-2 border rounded pointer">✓</button>
+                        <input
+                          className="mr-3 text-black"
+                          value={newKey}
+                          placeholder="private key"
+                          onChange={(e) => setNewKey(e.target.value)}
+                        />
+                        <button className="bg-white text-black px-2 border rounded pointer">
+                          ✓
+                        </button>
                       </form>
                     ) : (
                       <div>
                         <div>{key}</div>
-                        <button className="bg-white text-black px-2 border rounded pointer" onClick={removeKey}>x</button>
+                        <button
+                          className="bg-white text-black px-2 border rounded pointer"
+                          onClick={removeKey}
+                        >
+                          x
+                        </button>
                       </div>
-                    )
-                  }
+                    )}
+                  </div>
+                </div>
+                <div className="flex lg:hidden">
+                  {/* Mobile menu button */}
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    )}
+                  </Disclosure.Button>
                 </div>
               </div>
-              <div className="flex lg:hidden">
-                {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                  <span className="sr-only">Open main menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
-              </div>
             </div>
-          </div>
 
-          <Disclosure.Panel className="lg:hidden">
-            <ul className="space-y-1 px-2 pt-2 pb-3">
-              {routes.map((route) => (
-                <li key={route.href}>
-                  <Disclosure.Button className="w-full">
-                    <Link
-                      className={`flex items-center ${
-                        router.pathname === route.href ? "block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" : "block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                      }`}
-                      href={route.href}
-                    >
-                      {route.icon}
-                      <div className="ml-2">{route.label}</div>
-                    </Link>
-                  </Disclosure.Button>
-                </li>
-              ))}
-            </ul>
-          </Disclosure.Panel>
-        </>
-      )}
+            <Disclosure.Panel className="lg:hidden">
+              <ul className="space-y-1 px-2 pt-2 pb-3 bg-black">
+                {routes.map((route) => {
+                  const isActive = router.pathname === route.href;
+                  return (
+                    <li key={route.href}>
+                      <Disclosure.Button className="w-full">
+                        <Link
+                          onClick={() => close()}
+                          className={`flex items-center ${
+                            isActive
+                              ? "block rounded-md px-3 py-2 font-medium text-white"
+                              : "block rounded-md px-3 py-2 font-medium text-gray-300"
+                          }`}
+                          href={route.href}
+                        >
+                          {route.icon}
+                          <div
+                            className={`${isActive ? "fancy-text" : ""} ml-2`}
+                          >
+                            {route.label}
+                          </div>
+                        </Link>
+                      </Disclosure.Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Disclosure.Panel>
+          </>
+        );
+      }}
     </Disclosure>
-  )
+  );
 }

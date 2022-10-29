@@ -4,9 +4,6 @@ import Image from "next/image";
 const Dashboard = () => {
   return (
     <>
-      <h3 className="fancy-text uppercase mb-5 tracking-wider font-bold text-xl">
-        Dashboard
-      </h3>
       <div className="flex justify-center">
         <div className="flex items-center flex-col gap-4">
           <Image

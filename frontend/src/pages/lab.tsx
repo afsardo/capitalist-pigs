@@ -8,9 +8,6 @@ import Select from "src/components/Select";
 const Lab = () => {
   return (
     <>
-      <h3 className="fancy-text uppercase mb-5 tracking-wider font-bold text-xl">
-        Laboratory
-      </h3>
       <div className="flex flex-col md:flex-row justify-center gap-4">
         {/* <div className="flex items-center flex-col gap-4">
         <Image src="/pig_coop.jpeg" alt="co-op" width={600} height={600} />
