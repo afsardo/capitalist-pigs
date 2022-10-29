@@ -104,7 +104,7 @@ mod reverts {
     use super::*;
 
     #[tokio::test]
-    #[should_panic(expected = "Revert(42)")]
+    #[should_panic()]
     async fn when_no_token_supply_set() {
         let (_deploy_wallet, owner1, _owner2) = setup().await;
 

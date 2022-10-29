@@ -6,22 +6,31 @@ dep interface;
 dep constants;
 
 use data_structures::TokenMetaData;
-use errors::{AccessError, InitError, InputError, InflationError};
+use errors::{AccessError, InflationError, InitError, InputError};
 use interface::{Pigs};
 use constants::{THOUSAND, YEAR};
 
 use std::{
-    logging::log,
+    block::timestamp,
     chain::auth::*,
+    constants::{
+        BASE_ASSET_ID,
+        ZERO_B256,
+    },
+    context::{
+        *,
+        call_frames::*,
+    },
+    contract_id::ContractId,
+    identity::Identity,
+    logging::log,
     option::Option,
     result::Result,
-    block::timestamp,
-    identity::Identity,
+    revert::{
+        require,
+        revert,
+    },
     storage::StorageMap,
-    contract_id::ContractId,
-    revert::{require, revert},
-    context::{*, call_frames::*},
-    constants::{ZERO_B256, BASE_ASSET_ID}
 };
 
 storage {
@@ -75,17 +84,19 @@ storage {
     /// The timestamp over which `inflation_rate` applies.
     inflation_epoch: u64 = 0,
     /// The snapshotted total supply of NFTs used to regulate inflation.
-    snapshotted_supply: u64 = 0
+    snapshotted_supply: u64 = 0,
 }
 
 ///////////////////
 // Internal Methods
 ///////////////////
-#[storage(read, write)]fn add_pig(owner: Identity, pig: u64) {
+#[storage(read, write)]
+fn add_pig(owner: Identity, pig: u64) {
     storage.pigs.get(owner).push(pig);
 }
 
-#[storage(read, write)]fn remove_pig(owner: Identity, pig: u64) {
+#[storage(read, write)]
+fn remove_pig(owner: Identity, pig: u64) {
     let i: u64 = 0;
     let owned_pigs: Vec<u64> = storage.pigs.get(owner);
 
@@ -158,7 +169,15 @@ impl Pigs for Contract {
     }
 
     #[storage(read, write)]
-    fn constructor(access_control: bool, admin: Identity, piglet_transformer: Identity, max_supply: u64, inflation_start_time: u64, inflation_rate: u64, inflation_epoch: u64) {
+    fn constructor(
+        access_control: bool,
+        admin: Identity,
+        piglet_transformer: Identity,
+        max_supply: u64,
+        inflation_start_time: u64,
+        inflation_rate: u64,
+        inflation_epoch: u64,
+    ) {
         // This function can only be called once so if the token supply is already set it has
         // already been called
         // TODO: Remove this and update function definition to include Option once
@@ -167,7 +186,7 @@ impl Pigs for Contract {
         require(inflation_rate > 0 && inflation_rate <= THOUSAND, InitError::InvalidInflationRate);
         require(inflation_epoch > 0 && inflation_epoch <= YEAR, InitError::InvalidInflationEpoch);
 
-        let admin              = Option::Some(admin);
+        let admin = Option::Some(admin);
         let piglet_transformer = Option::Some(piglet_transformer);
 
         require(storage.max_supply == 0, InitError::CannotReinitialize);
@@ -175,12 +194,12 @@ impl Pigs for Contract {
         require((access_control && admin.is_some()) || (!access_control && admin.is_none()), InitError::AdminIsNone);
 
         storage.inflation_start_time = inflation_start_time;
-        storage.inflation_rate       = inflation_rate;
-        storage.inflation_epoch      = inflation_epoch;
-        storage.access_control       = access_control;
-        storage.admin                = admin;
-        storage.piglet_transformer   = piglet_transformer;
-        storage.max_supply           = max_supply;
+        storage.inflation_rate = inflation_rate;
+        storage.inflation_epoch = inflation_epoch;
+        storage.access_control = access_control;
+        storage.admin = admin;
+        storage.piglet_transformer = piglet_transformer;
+        storage.max_supply = max_supply;
     }
 
     #[storage(read, write)]
@@ -215,24 +234,22 @@ impl Pigs for Contract {
 
         // The current number of tokens minted plus the amount to be minted cannot be
         // greater than the total supply or the current allowed amount according to the `inflation_rate`
-        let elapsed_time: u64                 = (timestamp() - storage.inflation_start_time);
+        let elapsed_time: u64 = if (storage.inflation_start_time < timestamp()) { timestamp() - storage.inflation_start_time } else { 0 };
         let inflation_allowed_max_supply: u64 = storage.snapshotted_supply * (THOUSAND + storage.inflation_rate * (elapsed_time / storage.inflation_epoch)) / THOUSAND;
 
         require(storage.max_supply >= total_mint, InputError::NotEnoughTokensToMint);
-        if (storage.snapshotted_supply > 0 && inflation_allowed_max_supply > 0) {
+        if (storage.snapshotted_supply > 0
+            && inflation_allowed_max_supply > 0)
+        {
             require(inflation_allowed_max_supply >= total_mint, InflationError::MintExceedsInflation);
         }
 
         // Ensure that the sender is the admin if this is a controlled access mint or the `piglet_transformer` if the admin is this contract
-        let admin                               = storage.admin;
-        let piglet_transformer                  = storage.piglet_transformer;
+        let admin = storage.admin;
+        let piglet_transformer = storage.piglet_transformer;
         let caller: Result<Identity, AuthError> = msg_sender();
 
-        require(
-          (!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap())) ||
-          (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()),
-          AccessError::SenderNotAdminOrPigletTransformer
-        );
+        require((!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap())) || (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()), AccessError::SenderNotAdminOrPigletTransformer);
 
         // Mint as many tokens as the sender has asked for
         let mut index = tokens_minted;
@@ -271,20 +288,15 @@ impl Pigs for Contract {
         let current_admin = storage.admin;
         require(current_admin.is_some() && msg_sender().unwrap() == current_admin.unwrap(), AccessError::SenderCannotSetAccessControl);
         storage.admin = Option::Some(admin);
-
     }
 
     #[storage(read, write)]
     fn set_piglet_transformer(piglet_transformer: Identity) {
-        let current_admin              = storage.admin;
-        let new_piglet_transformer     = Option::Some(piglet_transformer);
+        let current_admin = storage.admin;
+        let new_piglet_transformer = Option::Some(piglet_transformer);
         let current_piglet_transformer = storage.piglet_transformer;
 
-        require(
-          (current_piglet_transformer.is_some() && msg_sender().unwrap() == current_piglet_transformer.unwrap()) ||
-          (current_admin.is_some() && msg_sender().unwrap() == current_admin.unwrap()),
-          AccessError::SenderCannotSetPigletTransformer
-        );
+        require((current_piglet_transformer.is_some() && msg_sender().unwrap() == current_piglet_transformer.unwrap()) || (current_admin.is_some() && msg_sender().unwrap() == current_admin.unwrap()), AccessError::SenderCannotSetPigletTransformer);
         storage.piglet_transformer = new_piglet_transformer;
     }
 
