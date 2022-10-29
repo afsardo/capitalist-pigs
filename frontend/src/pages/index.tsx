@@ -28,12 +28,10 @@ export default function Home() {
             </h4>
             <div className="animate-bounce text-4xl mb-16">👇</div>
             <div className="flex items-center gap-5">
-              <div className="rounded-lg bg-gray-700 p-4">
-                <Image src="/pig.jpeg" alt="lab" width={200} height={200} />
-              </div>
-              <p className="font-bold">
-                Acquire a <span className="fancy-text">PIG</span>
+              <p className="font-bold text-4xl">
+                Acquire a <span className="fancy-text-2">PIG...</span>
               </p>
+              <span className="text-7xl">🐖</span>
             </div>
           </div>
         </section>
