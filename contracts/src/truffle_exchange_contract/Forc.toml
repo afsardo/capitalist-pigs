@@ -1,0 +1,9 @@
+[project]
+authors = ["ETHLisbon Capitalist Pigs"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "truffle_exchange_contract"
+
+[dependencies]
+truffle_exchange_abi = { path = "../truffle_exchange_abi" }
+truffle_exchange_helpers = { path = "../truffle_exchange_helpers" }
