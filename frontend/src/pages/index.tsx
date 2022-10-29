@@ -33,9 +33,10 @@ export default function Home() {
 
         <section className="h-screen grid place-items-center text-center hide">
           <div>
-            <h4 className="mb-20 text-2xl">
-              The whole proccess is pretty straight-forward
+            <h4 className="mb-14 text-2xl uppercase bg-purple-700 font-bold inline-block p-4">
+              How it works
             </h4>
+            <div className="animate-bounce text-4xl mb-16">👇</div>
             <div className="flex items-center gap-5">
               <div className="rounded-lg bg-gray-700 p-4">
                 <Image src="/pig.jpeg" alt="lab" width={200} height={200} />
@@ -108,7 +109,7 @@ export default function Home() {
             <p className="text-white/70 mb-8 text-lg">
               Stop being a peasant today... be a part of the Capitalist Pigs
             </p>
-            <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest">
+            <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest animate-bounce">
               BUY
             </button>
           </div>
