@@ -233,6 +233,8 @@ impl PigletNFT for Contract {
     fn delegate(pig: u64, piglets: Vec<u64>) {
         let sender = msg_sender().unwrap();
 
+        require(piglets.len() > 0, InputError::InvalidNumberOfPiglets);
+
         validate_if_piglets_belong_to_sender(sender, piglets);
 
         let staking_id: b256 = storage.factory.into();
@@ -243,6 +245,8 @@ impl PigletNFT for Contract {
     #[storage(read, write)]
     fn remove_delegation(pig: u64, piglets: Vec<u64>) {
         let sender = msg_sender().unwrap();
+
+        require(piglets.len() > 0, InputError::InvalidNumberOfPiglets);
 
         validate_if_piglets_belong_to_sender(sender, piglets);
 
