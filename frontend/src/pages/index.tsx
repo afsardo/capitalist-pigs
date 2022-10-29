@@ -26,11 +26,7 @@ export default function Home() {
 
   return (
     <div>
-      <Heading className="mb-5">Capitalist Pigs</Heading>
-
       <main>
-        <Counter />
-
         <section className="h-screen grid place-items-center text-center hide">
           <div>
             <h4 className="mb-14 text-2xl uppercase bg-purple-700 font-bold inline-block p-4">
