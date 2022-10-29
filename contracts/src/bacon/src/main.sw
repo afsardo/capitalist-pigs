@@ -3,7 +3,7 @@ contract;
 dep errors;
 dep interface;
 
-use errors::Error;
+use errors::*;
 use interface::Bacon;
 
 use std::{
@@ -29,7 +29,7 @@ storage {
 /////////////////
 // Access Control
 /////////////////
-/// Return the sender as an Address or panic
+/// Return the sender as an address or panic
 fn get_msg_sender_address_or_panic() -> Address {
     let sender: Result<Identity, AuthError> = msg_sender();
     if let Identity::Address(address) = sender.unwrap() {
