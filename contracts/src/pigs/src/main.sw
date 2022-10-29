@@ -258,7 +258,7 @@ impl Pigs for Contract {
 
         // Mint as many tokens as the sender has asked for
         let mut index = tokens_minted;
-        while index < total_mint {
+        while (index < total_mint) {
             // Create the TokenMetaData for this new token
             storage.meta_data.insert(index, ~TokenMetaData::new());
             storage.owners.insert(index, Option::Some(to));

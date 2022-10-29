@@ -6,7 +6,7 @@ dep constants;
 
 use errors::*;
 use interface::{Staking};
-use constants::{MAX_DELEGATORS};
+use constants::{ZERO, MAX_DELEGATORS};
 
 use std::{
     chain::auth::msg_sender,
@@ -23,6 +23,8 @@ use std::{
 storage {
     /// The pig NFT contract address
     pigs: Option<ContractId> = Option::None,
+    /// The piglet NFT contract address
+    piglets: Option<ContractId> = Option::None,
     /// The fee token contract address
     fee_token: Option<ContractId> = Option::None,
     /// The fee distributor contract
@@ -34,7 +36,7 @@ storage {
     /// The pigs a user currently stakes
     staked_pigs: StorageMap<Identity, Vec<u64>> = StorageMap {},
     /// The total staking power a pig staker has
-    staking_power: StorageMap<Identity, u64> = StorageMap {},
+    staking_power: StorageMap<u64, u64> = StorageMap {},
     /// The mapping of all piglet owners
     piglet_owner: StorageMap<u64, Identity> = StorageMap {},
     /// The piglets a user currently delegates
@@ -56,6 +58,64 @@ storage {
 ///////
 // ABIs
 ///////
+abi Pigs {
+    #[storage(read)]
+    fn admin() -> Identity;
+
+    #[storage(read)]
+    fn piglet_transformer() -> Identity;
+
+    #[storage(read, write)]
+    fn approve(approved: Identity, token_id: u64);
+
+    #[storage(read)]
+    fn approved(token_id: u64) -> Identity;
+
+    #[storage(read)]
+    fn balance_of(owner: Identity) -> u64;
+
+    #[storage(read)]
+    fn pigs(owner: Identity, index: u64) -> u64;
+
+    #[storage(read, write)]
+    fn burn(token_id: u64);
+
+    fn constructor(access_control: bool, admin: Identity, piglet_transformer: Identity, max_supply: u64, inflation_start_time: u64, inflation_rate: u64, inflation_epoch: u64);
+
+    #[storage(read, write)]
+    fn snapshot_supply();
+
+    #[storage(read)]
+    fn is_approved_for_all(operator: Identity, owner: Identity) -> bool;
+
+    #[storage(read)]
+    fn max_supply() -> u64;
+
+    #[storage(read, write)]
+    fn mint(amount: u64, to: Identity);
+
+    #[storage(read)]
+    fn meta_data(token_id: u64) -> TokenMetaData;
+
+    #[storage(read)]
+    fn owner_of(token_id: u64) -> Identity;
+
+    #[storage(read, write)]
+    fn set_admin(admin: Identity);
+
+    #[storage(read, write)]
+    fn set_piglet_transformer(piglet_transformer: Identity);
+
+    #[storage(read, write)]
+    fn set_approval_for_all(approve: bool, operator: Identity);
+
+    #[storage(read)]
+    fn total_supply() -> u64;
+
+    #[storage(read, write)]
+    fn transfer_from(from: Identity, to: Identity, token_id: u64);
+}
+
 abi Piglet {
     #[storage(read)]
     fn admin() -> Identity;
@@ -158,11 +218,20 @@ abi BaconDistributor {
     fn claim_fees(amount: u64);
 }
 
+///////////////////
+// Internal Methods
+///////////////////
+/// Claim fees for the pig staker and users who delegated piglets to the target pig
+#[storage(read, write)] fn _claim_fees(pig: u64) {
+
+}
+
 impl Staking for Contract {
     #[storage(read, write)]
-    fn constructor(pigs: ContractId, fee_token: ContractId, fee_distributor: ContractId, truffles: ContractId, fees_per_second: u64, truffles_per_second: u64) {
+    fn constructor(pigs: ContractId, piglets: ContractId, fee_token: ContractId, fee_distributor: ContractId, truffles: ContractId, fees_per_second: u64, truffles_per_second: u64) {
         require(fee_distributor == BASE_ASSET_ID, InitError::CannotReinitialize);
         require(pigs != BASE_ASSET_ID, InitError::PigsIsNone);
+        require(piglets != BASE_ASSET_ID, InitError::PigletsIsNone);
         require(fee_token != BASE_ASSET_ID, InitError::FeeTokenIsNone);
         require(fee_distributor != BASE_ASSET_ID, InitError::FeeDistributorIsNone);
         require(truffles != BASE_ASSET_ID, InitError::TrufflesIsNone);
@@ -170,6 +239,7 @@ impl Staking for Contract {
         require(truffles_per_second > 0, InitError::InvalidTrufflesPerSecond);
 
         storage.pigs                = Option::Some(pigs);
+        storage.piglets             = Option::Some(piglets);
         storage.fee_token           = Option::Some(fee_token);
         storage.fee_distributor     = Option::Some(fee_distributor);
         storage.truffles            = Option::Some(truffles);
@@ -179,20 +249,25 @@ impl Staking for Contract {
 
     #[storage(read)]
     fn pigs() -> ContractId {
-        storage.pigs
+        storage.pigs.unwrap()
+    }
+
+    #[storage(read)]
+    fn piglets() -> ContractId {
+        storage.piglets.unwrap()
     }
 
     #[storage(read)]
     fn fee_token() -> ContractId {
-        storage.fee_token
+        storage.fee_token.unwrap()
     }
 
     fn fee_distributor() -> Identity {
-        storage.fee_distributor
+        storage.fee_distributor.unwrap()
     }
 
     fn truffles() -> ContractId {
-        storage.truffles
+        storage.truffles.unwrap()
     }
 
     #[storage(read)]
@@ -213,8 +288,8 @@ impl Staking for Contract {
     }
 
     #[storage(read)]
-    fn staking_power(user: Identity) -> u64 {
-        storage.staking_power.get(user)
+    fn staking_power(pig: u64) -> u64 {
+        storage.staking_power.get(pig)
     }
 
     #[storage(read)]
@@ -246,7 +321,7 @@ impl Staking for Contract {
 
     #[storage(read)]
     fn accrued_truffles(pig: u64) -> u64 {
-        
+
     }
 
     #[storage(read)]
@@ -255,23 +330,69 @@ impl Staking for Contract {
     #[storage(read)]
     fn accrued_piglet_fees(piglet: u64) -> u64;
 
-    #[storage(read)]
-    fn delegators(pig: u64) -> Vec<Identity>;
+    #[storage(read, write)]
+    fn delegate(delegator: Identity, pig: u64, piglets: Vec<u64>) {
+        require(pig > ZERO, InputError::InvalidPig);
+        require(piglets.len() > ZERO, InputError::NullArray);
+        require(delegator != Identity::ContractId(contract_id()), InputError::CannotAssingToThisContract);
+
+        // Check if the target pig is in this contract
+        let pigs_contract = abi(Pigs, storage.pig.unwrap().into());
+        let piglet_contract = abi(Piglet, storage.piglets.unwrap().into());
+        require(
+            storage.pig_owner.get(pig) != Identity::ContractId(~ContractId::from(ZERO_B256)) &&
+            storage.pig_owner.get(pig) != Identity::Address(~Address::from(ZERO_B256)) &&
+            pigs_contract.owner_of(pig) == Identity::ContractId(contract_id())
+        );
+
+        _claim_fees(pig);
+        storage.staking_power.insert(pig, storage.staking_power.get(pig) + piglets.len());
+
+        let i: u64 = 0;
+        while (i < piglets.len()) {
+            require(piglet_contract.owner_of(piglets.get(i).unwrap()) != Identity::ContractId(contract_id()), InputError::PigletAlreadyDelegated);
+
+            storage.piglet_owner.insert(piglets.get(i).unwrap(), delegator);
+            storage.delegated_piglets.get(delegator).push(piglets.get(i).unwrap());
+            storage.piglet_to_pig.insert(piglets.get(i).unwrap(), pig);
+
+            piglet_contract.transfer_from(msg_sender().unwrap(), Identity::ContractId(~ContractId::from(contract_id())), piglets.get(i).unwrap());
+        }
+    }
 
     #[storage(read, write)]
-    fn delegate(delegator: Identity, pig: u64, piglets: [u64]);
+    fn undelegate(delegator: Identity, pig: u64, piglets: Vec<u64>) {
+        require(pig > ZERO, InputError::InvalidPig);
+        require(piglets.len() > ZERO, InputError::NullArray);
+
+        let i: u64           = 0;
+        let caller: Identity = msg_sender().unwrap();
+        let piglet_contract  = abi(Piglet, storage.piglets.unwrap().into());
+
+        _claim_fees(pig);
+        storage.staking_power.insert(pig, storage.staking_power.get(pig) - piglets.len());
+
+        while (i < piglets.len()) {
+            require(storage.piglet_owner.get(piglets.get(i).unwrap()) == caller, AccessControlError::CallerNotPigletOwner);
+
+            
+
+            piglet_contract.transfer_from(Identity::ContractId(~ContractId::from(contract_id())), delegator, piglets.get(i).unwrap());
+        }
+    }
 
     #[storage(read, write)]
-    fn undelegate(delegator: Identity, pig: u64, piglets: [u64]);
-
-    #[storage(read, write)]
-    fn stake(pig: u64, user: Identity);
+    fn stake(pig: u64, user: Identity) {
+        require(pig > ZERO, InputError::InvalidPig);
+    }
 
     #[storage(read, write)]
     fn unstake(pig: u64);
 
     #[storage(read, write)]
-    fn claim_fees(pig: u64);
+    fn claim_fees(pig: u64) {
+        _claim_fees(pig);
+    }
 
     #[storage(read, write)]
     fn set_fee_commission(pig: u64, commission: u64);
