@@ -9,17 +9,18 @@ use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError, InflationError};
 use interface::{NFT};
 use constants::{THOUSAND, YEAR, ONE};
+
 use std::{
-    chain::auth::*,
-    identity::Identity,
-    context::{*, call_frames::*},
-    contract_id::ContractId,
     logging::log,
+    chain::auth::*,
     option::Option,
     result::Result,
-    revert::{require, revert},
-    storage::StorageMap,
     block::timestamp,
+    identity::Identity,
+    storage::StorageMap,
+    contract_id::ContractId,
+    revert::{require, revert},
+    context::{*, call_frames::*},
     constants::{ZERO_B256, BASE_ASSET_ID}
 };
 
@@ -96,7 +97,7 @@ storage {
     }
 }
 
-impl NFT for Contract {
+impl Pig for Contract {
     #[storage(read)]
     fn admin() -> Identity {
         let admin = storage.admin;

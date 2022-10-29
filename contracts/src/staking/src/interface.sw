@@ -3,21 +3,34 @@ library interface;
 use std::{identity::Identity, vec::Vec};
 
 abi Staking {
-    /// Returns the address of the Pig NFT contract.
+    /// Initialize the contract
+    ///
+    /// # Arguments
+    ///
+    /// * `pigs` - The pig NFT contract address
+    /// * `fee_token` - The address of the fee token contract
+    /// * `fee_distributor` - The address of the fee distributor contract
+    /// * `truffles` - The address of the truffles contract
+    /// * `fees_per_second` - The amount of fees sent accruing to each staked pig every second
+    /// * `truffles_per_second` - The amount of truffles minted per second for each staked pig
+    #[storage(read, write)]
+    fn constructor(pigs: Identity, fee_token: Identity, fee_distributor: Identity, truffles: Identity, fees_per_second: u64, truffles_per_second: u64);
+
+    /// Returns the address of the Pig NFT contract
     #[storage(read)]
     fn pigs() -> Identity;
 
-    /// Returns the address of the fee token offered for staking.
+    /// Returns the address of the fee token offered for staking
     #[storage(read)]
     fn fee_token() -> Identity;
 
     /// Returns the address of the fee distributor
     fn fee_distributor() -> Identity;
 
-    /// Returns the address of the Truffes token contract.
+    /// Returns the address of the Truffes token contract
     fn truffles() -> Identity;
 
-    /// Returns the address of the user that has a specific NFT staked.
+    /// Returns the address of the user that has a specific NFT staked
     #[storage(read)]
     fn owner_of(pig: u64) -> Identity;
 
@@ -28,7 +41,7 @@ abi Staking {
     /// * `user` - The staker for which we return all staked pigs
     fn staked_pigs(user: Identity) -> Vec<u64>;
 
-    /// Returns the balance of the `user`.
+    /// Returns the balance of the `user`
     ///
     /// # Arguments
     ///
@@ -36,11 +49,11 @@ abi Staking {
     #[storage(read)]
     fn balance_of(user: Identity) -> u64;
 
-    /// Return the staking power of a pig staker.
+    /// Return the staking power of a pig staker
     ///
     /// # Arguments
     ///
-    /// * `user` - The staker whose staking power we return.
+    /// * `user` - The staker whose staking power we return
     #[storage(read)]
     fn staking_power(user: Identity) -> u64;
 
@@ -79,6 +92,16 @@ abi Staking {
     ///
     /// * `pig` - The pig for which we return the commission
     fn fee_commission(pig: u64) -> u64;
+
+    /// Return the amount of truffles minted each second for a staked pig
+    fn truffles_per_second() -> u64;
+
+    /// Return the amount of accrued and unminted truffles for a staked pig
+    ///
+    /// # Arguments
+    ///
+    /// * `pig` - The pig for which we return the accrued and unminted truffles
+    fn accrued_truffles(pig: u64) -> u64;
 
     /// Return the accrued and unclaimed fees for a staked pig
     ///
