@@ -51,14 +51,14 @@ export default function Home() {
             </div>
             <div className="text-right text-2xl hide">
               <span className="fancy-text-2">Hold</span> your pig to{" "}
-              <span className="fancy-text font-bold">generate mucus!</span>
+              <span className="fancy-text font-bold">generate truffles!</span>
             </div>
           </div>
         </section>
         <section className="h-screen grid place-items-center text-center">
           <div>
             <h5 className="tracking-wider mb-12 text-xl">
-              You can now use your mucus to...
+              You can now use your truffles to...
             </h5>
             <div className="flex justify-center gap-x-4 mb-8">
               <div className="rounded-lg bg-green-700 p-4 hide logo-container hover:scale-125">
