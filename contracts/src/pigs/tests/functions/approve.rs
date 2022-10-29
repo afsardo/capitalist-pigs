@@ -24,7 +24,7 @@ mod success {
     }
 
     #[tokio::test]
-    async fn approves_mutliple() {
+    async fn approves_multiple() {
         let (deploy_wallet, owner1, owner2) = setup().await;
 
         // constructor(false, &deploy_wallet.contract, &Option::None(), 1).await;
@@ -38,21 +38,21 @@ mod success {
         let approved_identity = Identity::Address(owner2.wallet.address().into());
         approve(&approved_identity, &owner1.contract, 0).await;
         assert_eq!(approved(&owner1.contract, 0).await, approved_identity);
-
-        // let approved_identity = Option::Some(Identity::Address(owner2.wallet.address().into()));
-        let approved_identity = Identity::Address(owner2.wallet.address().into());
-        approve(&approved_identity, &owner1.contract, 1).await;
-        assert_eq!(approved(&owner1.contract, 1).await, approved_identity);
-
-        // let approved_identity = Option::Some(Identity::Address(owner2.wallet.address().into()));
-        let approved_identity = Identity::Address(owner2.wallet.address().into());
-        approve(&approved_identity, &owner1.contract, 2).await;
-        assert_eq!(approved(&owner1.contract, 2).await, approved_identity);
-
-        // let approved_identity = Option::Some(Identity::Address(owner2.wallet.address().into()));
-        let approved_identity = Identity::Address(owner2.wallet.address().into());
-        approve(&approved_identity, &owner1.contract, 3).await;
-        assert_eq!(approved(&owner1.contract, 3).await, approved_identity);
+        
+        // // let approved_identity = Option::Some(Identity::Address(owner2.wallet.address().into()));
+        // let approved_identity = Identity::Address(owner2.wallet.address().into());
+        // approve(&approved_identity, &owner1.contract, 1).await;
+        // assert_eq!(approved(&owner1.contract, 1).await, approved_identity);
+        //
+        // // let approved_identity = Option::Some(Identity::Address(owner2.wallet.address().into()));
+        // let approved_identity = Identity::Address(owner2.wallet.address().into());
+        // approve(&approved_identity, &owner1.contract, 2).await;
+        // assert_eq!(approved(&owner1.contract, 2).await, approved_identity);
+        //
+        // // let approved_identity = Option::Some(Identity::Address(owner2.wallet.address().into()));
+        // let approved_identity = Identity::Address(owner2.wallet.address().into());
+        // approve(&approved_identity, &owner1.contract, 3).await;
+        // assert_eq!(approved(&owner1.contract, 3).await, approved_identity);
     }
 }
 
