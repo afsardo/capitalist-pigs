@@ -44,7 +44,7 @@ storage {
     /// The piglets delegated to each pig
     piglet_to_pig: StorageMap<u64, u64> = StorageMap {},
     /// The commission offered to delegators of a specific pig
-    fee_commission: u64 = 0,
+    fee_commission: StorageMap<u64, u64> = StorageMap {},
     /// Total amount of fees distributed per second to each staked pig
     fees_per_second: u64 = 0,
     /// Amount of new truffles that can be minted each second for a staked pig
@@ -330,7 +330,7 @@ impl Staking for Contract {
 
     #[storage(read)]
     fn fee_commission(pig: u64) -> u64 {
-        storage.fee_commission
+        storage.fee_commission.get(pig)
     }
 
     #[storage(read)]
@@ -440,6 +440,11 @@ impl Staking for Contract {
 
     #[storage(read, write)]
     fn set_fee_commission(pig: u64, commission: u64) {
+        let caller: Identity = msg_sender().unwrap();
 
+        require(storage.pig_owner.get(pig) == caller, AccessError::SenderNotOwner);
+        require(commission <= 100, InputError::InvalidComissionValue)
+        
+        storage.fee_commission.insert(pig, commission);
     }
 }

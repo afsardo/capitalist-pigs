@@ -31,4 +31,5 @@ pub enum InputError {
     OwnerDoesNotExist: (),
     TokenDoesNotExist: (),
     TokenSupplyCannotBeZero: (),
+    InvalidComissionValue: (),
 }
