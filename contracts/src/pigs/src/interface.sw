@@ -1,13 +1,8 @@
 library interface;
-
 dep data_structures;
-
 use data_structures::TokenMetaData;
 use std::{identity::Identity};
-
 abi Pigs {
-    #[storage(read, write)]
-    fn gg(puta_madre: Identity) -> u64;
     /// Returns the current admin for the contract
     ///
     /// # Reverts
@@ -15,7 +10,6 @@ abi Pigs {
     /// * When the contract does not have an admin
     #[storage(read)]
     fn admin() -> Identity;
-
     /// Returns the current piglet transformer for the contract
     ///
     /// # Reverts
@@ -23,7 +17,6 @@ abi Pigs {
     /// * When the contract does not have a piglet transformer
     #[storage(read)]
     fn piglet_transformer() -> Identity;
-
     /// Gives approval to the `approved` user to transfer a specific token on another user's behalf
     ///
     /// To revoke approval the approved user should be `None`
@@ -39,7 +32,6 @@ abi Pigs {
     /// * When the sender is not the token's owner
     #[storage(read, write)]
     fn approve(approved: Identity, token_id: u64);
-
     /// Returns the user which is approved to transfer the given token
     ///
     /// If there is no approved user or the unique identifier does not map to an existing token,
@@ -54,7 +46,6 @@ abi Pigs {
     /// * When there is no approved for the `token_id`
     #[storage(read)]
     fn approved(token_id: u64) -> Identity;
-
     /// Returns the balance of the `owner` user
     ///
     /// # Arguments
@@ -62,7 +53,6 @@ abi Pigs {
     /// * `owner` - The user of which the balance should be returned
     #[storage(read)]
     fn balance_of(owner: Identity) -> u64;
-
     /// Returns a pig that an owner holds at a specific index in their pig array
     ///
     /// # Arguments
@@ -70,7 +60,6 @@ abi Pigs {
     /// * `owner` - The owner for which we return a pig that they hold at a specific index in their pig array
     #[storage(read)]
     fn pigs(owner: Identity, index: u64) -> u64;
-
     /// Burns the specified token
     ///
     /// When burned, the metadata of the token is removed. After the token has been burned, no one
@@ -86,7 +75,6 @@ abi Pigs {
     /// * When sender is not the owner of the token
     #[storage(read, write)]
     fn burn(token_id: u64);
-
     /// Sets the inital state and unlocks the functionality for the rest of the contract
     ///
     /// This function can only be called once
@@ -108,11 +96,9 @@ abi Pigs {
     /// * When `access_control` is set to true and no admin `Identity` was given
     #[storage(read, write)]
     fn constructor(access_control: bool, admin: Identity, piglet_transformer: Identity, max_supply: u64, inflation_start_time: u64, inflation_rate: u64, inflation_epoch: u64);
-
     /// Snapshots the `total_supply` so that inflation can start
     #[storage(read, write)]
     fn snapshot_supply();
-
     /// Returns whether the `operator` user is approved to transfer all tokens on the `owner`
     /// user's behalf
     ///
@@ -122,11 +108,9 @@ abi Pigs {
     /// * `owner` - The user which has given approval to transfer all tokens to the `operator`
     #[storage(read)]
     fn is_approved_for_all(operator: Identity, owner: Identity) -> bool;
-
     /// Returns the total number of tokens which will ever be minted.
     #[storage(read)]
     fn max_supply() -> u64;
-
     /// Mints `amount` number of tokens to the `to` `Identity`
     ///
     /// Once a token has been minted, it can be transfered and burned
@@ -142,7 +126,6 @@ abi Pigs {
     /// * When the sender is not the admin and `access_control` is set
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity);
-
     /// Returns the metadata for the token specified
     ///
     /// # Arguments
@@ -154,7 +137,6 @@ abi Pigs {
     /// * When the `token_id` does not map to an exsiting token
     #[storage(read)]
     fn meta_data(token_id: u64) -> TokenMetaData;
-
     /// Returns the user which owns the specified token
     ///
     /// # Arguments
@@ -166,7 +148,6 @@ abi Pigs {
     /// * When there is no owner for the `token_id`
     #[storage(read)]
     fn owner_of(token_id: u64) -> Identity;
-
     /// Changes the contract's admin
     ///
     /// This new admin will have access to minting if `access_control` is set to true and be able
@@ -181,7 +162,6 @@ abi Pigs {
     /// * When the sender is not the `admin` in storage
     #[storage(read, write)]
     fn set_admin(admin: Identity);
-
     /// Changes the contract's piglet transformer
     ///
     /// This new piglet transformer will have access to minting if `admin` is null
@@ -195,7 +175,6 @@ abi Pigs {
     /// * When the sender is not the `admin` or the current `piglet_transformer` in storage
     #[storage(read, write)]
     fn set_piglet_transformer(piglet_transformer: Identity);
-
     /// Gives the `operator` user approval to transfer ALL tokens owned by the `owner` user
     ///
     /// This can be dangerous. If a malicous user is set as an operator to another user, they could
@@ -207,11 +186,9 @@ abi Pigs {
     /// * `operator` - The user which may transfer all tokens on the owner's behalf
     #[storage(read, write)]
     fn set_approval_for_all(approve: bool, operator: Identity);
-
     /// Returns the total supply of tokens which are currently in existence
     #[storage(read)]
     fn total_supply() -> u64;
-
     /// Transfers ownership of the specified token from one user to another
     ///
     /// Transfers can occur under one of three conditions:

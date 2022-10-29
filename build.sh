@@ -14,6 +14,5 @@ forc build -p contracts/src/truffles
 forc build -p contracts/src/truffles --output-directory contracts/out/debug
 forc build -p contracts/src/truffles_pool
 forc build -p contracts/src/truffles_pool --output-directory contracts/out/debug
-
 forc build -p contracts/src/mock_contract
 forc build -p contracts/src/mock_contract --output-directory contracts/out/debug

@@ -97,7 +97,7 @@ fn add_pig(owner: Identity, pig: u64) {
 
 #[storage(read, write)]
 fn remove_pig(owner: Identity, pig: u64) {
-    let i: u64 = 0;
+    let mut i: u64 = 0;
     let owned_pigs: Vec<u64> = storage.pigs.get(owner);
 
     while (i < owned_pigs.len()) {
@@ -236,7 +236,11 @@ impl Pigs for Contract {
 
         // The current number of tokens minted plus the amount to be minted cannot be
         // greater than the total supply or the current allowed amount according to the `inflation_rate`
-        let elapsed_time: u64 = if (storage.inflation_start_time < timestamp()) { timestamp() - storage.inflation_start_time } else { 0 };
+        let elapsed_time: u64 = if (storage.inflation_start_time < timestamp()) {
+            timestamp() - storage.inflation_start_time
+        } else {
+            0
+        };
         let inflation_allowed_max_supply: u64 = storage.snapshotted_supply * (THOUSAND + storage.inflation_rate * (elapsed_time / storage.inflation_epoch)) / THOUSAND;
 
         require(storage.max_supply >= total_mint, InputError::NotEnoughTokensToMint);
