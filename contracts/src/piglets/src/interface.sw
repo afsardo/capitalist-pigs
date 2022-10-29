@@ -4,7 +4,7 @@ dep data_structures;
 
 use data_structures::TokenMetaData;
 use std::{
-    identity::Identity, 
+    identity::Identity,
     contract_id::ContractId,
     vec::Vec
 };
@@ -181,11 +181,11 @@ abi PigletNFT {
     /// * When there is no owner for the `token_id`.
     #[storage(read)]
     fn owner_of(token_id: u64) -> Identity;
-    
+
     // Return the piglets_to_pigs_ratio
     #[storage(read)]
     fn piglets_to_pigs_ratio() -> u64;
-    
+
     /// Returns the whole array of piglets that a user holds.
     ///
     /// # Arguments
@@ -193,11 +193,11 @@ abi PigletNFT {
     /// * `owner` - The owner for which we return the whole array of piglets they currently hold
     #[storage(read)]
     fn piglets(owner: Identity) -> Vec<u64>;
-    
+
     /// Returns the factory contract.
     #[storage(read)]
     fn get_factory() -> ContractId;
-    
+
     /// Returns the piglet minter for the contract.
     #[storage(read)]
     fn piglet_minter() -> Identity;
@@ -265,8 +265,6 @@ abi PigletNFT {
     /// * When the sender is not approved to transfer all tokens on the owner's behalf.
     #[storage(read, write)]
     fn transfer_from(from: Identity, to: Identity, token_id: u64);
-<<<<<<< HEAD
-=======
 
     /// Returns the current piglet minter for the contract.
     ///
@@ -275,5 +273,4 @@ abi PigletNFT {
     /// * When the contract does not have a piglet minter.
     #[storage(read)]
     fn piglet_minter() -> Identity;
->>>>>>> b0c50ee (Start to code getters for staking contract)
 }
