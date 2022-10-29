@@ -96,6 +96,7 @@ abi PigletNFT {
     /// * When piglets are not owned by sender
     #[storage(read, write)]
     fn delegate(pig: u64, piglets: Vec<u64>);
+    
     /// Removes the piglets delegation from pig
     ///
     /// # Arguments
@@ -109,6 +110,7 @@ abi PigletNFT {
     /// * When Staking contract fails
     #[storage(read, write)]
     fn remove_delegation(pig: u64, piglets: Vec<u64>);
+    
     /// Returns whether the `operator` user is approved to transfer all tokens on the `owner`
     /// user's behalf.
     ///
@@ -118,6 +120,7 @@ abi PigletNFT {
     /// * `owner` - The user which has given approval to transfer all tokens to the `operator`.
     #[storage(read)]
     fn is_approved_for_all(operator: Identity, owner: Identity) -> bool;
+    
     /// Mints `amount` number of tokens to the `to` `Identity`.
     ///
     /// Once a token has been minted, it can be transfered and burned.
@@ -148,17 +151,7 @@ abi PigletNFT {
     /// * When the Pig Contract fails
     #[storage(read, write)]
     fn mintPigs(piglets: Vec<u64>);
-    /// Returns the metadata for the token specified
-    ///
-    /// # Arguments
-    ///
-    /// * `token_id` - The unique identifier of the token.
-    ///
-    /// # Reverts
-    ///
-    /// * When the `token_id` does not map to an exsiting token.
-    #[storage(read)]
-    fn meta_data(token_id: u64) -> TokenMetaData;
+
     /// Returns the user which owns the specified token.
     ///
     /// # Arguments

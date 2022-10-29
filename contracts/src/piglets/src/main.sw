@@ -11,7 +11,6 @@ use interface::{PigletNFT};
 use factory_interface::{PigABI};
 use staking_interface::{StakingABI};
 
-use constants::{NULLSTRING};
 use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError};
 
