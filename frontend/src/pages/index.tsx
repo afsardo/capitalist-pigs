@@ -21,13 +21,13 @@ export default function Home() {
   return (
     <div>
       <main>
-        <section className="h-screen grid place-items-center text-center hide">
+        <section className="h-screen grid place-items-center text-center">
           <div>
             <h4 className="mb-14 text-2xl uppercase bg-purple-700 font-bold inline-block py-4 px-6">
               How it works
             </h4>
             <div className="animate-bounce text-4xl mb-16">👇</div>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 hide">
               <p className="font-bold text-4xl">
                 Acquire a <span className="fancy-text-2">PIG...</span>
               </p>
