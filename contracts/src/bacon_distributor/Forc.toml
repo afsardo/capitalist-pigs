@@ -1,5 +1,0 @@
-[project]
-authors = ["ETHLisbon Capitalist Pigs"]
-entry = "main.sw"
-license = "Apache-2.0"
-name = "bacon_distributor"

@@ -1,5 +1,10 @@
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect } from "react";
+
+const Test = dynamic(() => import("../components/Test"), {
+  ssr: false,
+});
 
 export default function Home() {
   useEffect(() => {
@@ -17,8 +22,11 @@ export default function Home() {
     sections.forEach((section) => observer.observe(section));
   }, []);
 
+  return <Test />;
+
   return (
     <div>
+      <Test />
       <main>
         <section className="h-screen grid place-items-center text-center">
           <div>

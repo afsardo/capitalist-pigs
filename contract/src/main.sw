@@ -1,14 +1,57 @@
 contract;
 
-dep data_structures;
-dep errors;
-dep interface;
-dep constants;
+// use errors::{AccessError, InflationError, InitError, InputError};
+// use interface::{Pigs};
+// use constants::{THOUSAND, YEAR};
 
-use data_structures::TokenMetaData;
-use errors::{AccessError, InflationError, InitError, InputError};
-use interface::{Pigs};
-use constants::{THOUSAND, YEAR};
+pub struct TokenMetaData {
+    // This is left as an example. Support for dynamic length string is needed here
+    name: str[7],
+}
+
+impl TokenMetaData {
+    fn new() -> Self {
+        Self {
+            name: "Example",
+        }
+    }
+}
+
+pub enum AccessError {
+    SenderCannotSetAccessControl: (),
+    SenderNotAdminOrPigletTransformer: (),
+    SenderCannotSetPigletTransformer: (),
+    SenderNotOwner: (),
+    SenderNotOwnerOrApproved: (),
+}
+
+pub enum InitError {
+    AdminIsNone: (),
+    InvalidInflationStartTime: (),
+    InvalidInflationRate: (),
+    InvalidInflationEpoch: (),
+    CannotReinitialize: (),
+}
+
+pub enum InflationError {
+    InvalidSnapshotTime: (),
+    AlreadySnapshotted: (),
+    MintExceedsInflation: ()
+}
+
+pub enum InputError {
+    AdminDoesNotExist: (),
+    IndexExceedsArrayLength: (),
+    PigletTransformerDoesNotExist: (),
+    ApprovedDoesNotExist: (),
+    NotEnoughTokensToMint: (),
+    OwnerDoesNotExist: (),
+    TokenDoesNotExist: (),
+    TokenSupplyCannotBeZero: (),
+}
+
+pub const THOUSAND: u64 = 1000;
+pub const YEAR: u64     = 31536000;
 
 use std::{
     block::timestamp,
@@ -33,7 +76,12 @@ use std::{
     storage::StorageMap,
 };
 
+// Storage is the way to add persistent state to our contracts.
+//
+// For this contract, create a storage variable called `counter` and initialize it to 0.
 storage {
+    counter: u64 = 0,
+
     /// Determines if only the contract's `admin` is allowed to call the mint function.
     /// This is only set on the initalization of the contract.
     access_control: bool = false,
@@ -87,87 +135,82 @@ storage {
     snapshotted_supply: u64 = 0,
 }
 
-///////////////////
-// Internal Methods
-///////////////////
 #[storage(read, write)]
 fn add_pig(owner: Identity, pig: u64) {
     storage.pigs.get(owner).push(pig);
 }
 
-#[storage(read, write)]
-fn remove_pig(owner: Identity, pig: u64) {
-    let i: u64 = 0;
-    let owned_pigs: Vec<u64> = storage.pigs.get(owner);
+// Define the interface our contract shall have
+abi MyContract {
+    // A `counter` method with no parameters that returns the current value of the counter and 
+    // *only reads* from storage.
+    #[storage(read)]
+    fn counter() -> u64;
 
-    while (i < owned_pigs.len()) {
-        if (owned_pigs.get(i).unwrap() == pig) {
-            storage.pigs.get(owner).remove(i);
-            break;
-        }
+    /// Sets the inital state and unlocks the functionality for the rest of the contract
+    ///
+    /// This function can only be called once
+    ///
+    /// # Arguments
+    ///
+    /// * `access_control` - Determines whether only the admin can call the mint function
+    /// * `admin` - The user which has the ability to mint if `access_control` is set to true and change the contract's admin
+    /// * `piglet_transformer` - The contract that has the ability to mint new pig NFTs if the `admin` is null
+    /// * `max_supply` - The maximum supply of tokens that can ever be minted
+    /// * `inflation_start_time` - The timestamp when inflation starts
+    /// * `inflation_rate` - The inflation rate allowed every epoch
+    /// * `inflation_epoch` - The epoch during which `inflation_rate` inflation is allowed
+    ///
+    /// # Reverts
+    ///
+    /// * When the constructor function has already been called
+    /// * When the `token_supply` is set to 0
+    /// * When `access_control` is set to true and no admin `Identity` was given
+    #[storage(read, write)]
+    fn constructor(access_control: bool, admin: Identity, piglet_transformer: Identity, max_supply: u64, inflation_start_time: u64, inflation_rate: u64, inflation_epoch: u64);
 
-        i += 1;
-    }
+    // An `increment` method that takes a single integer parameter, increments the counter by that 
+    // parameter, and returns its new value. This method has read/write access to storage.
+    #[storage(read, write)]
+    fn increment(param: u64) -> u64;
+
+    /// Mints `amount` number of tokens to the `to` `Identity`
+    ///
+    /// Once a token has been minted, it can be transfered and burned
+    ///
+    /// # Arguments
+    ///
+    /// * `amount` - The number of tokens to be minted in this transaction
+    /// * `to` - The user which will own the minted tokens
+    ///
+    /// # Reverts
+    ///
+    /// * When the sender attempts to mint more tokens than total supply
+    /// * When the sender is not the admin and `access_control` is set
+    #[storage(read, write)]
+    fn mint(amount: u64, to: Identity);
+
+    /// Returns the total supply of tokens which are currently in existence
+    #[storage(read)]
+    fn total_supply() -> u64;
 }
 
-impl Pigs for Contract {
+// The implementation of the contract's ABI
+impl MyContract for Contract {
     #[storage(read)]
-    fn admin() -> Identity {
-        let admin = storage.admin;
-        require(admin.is_some(), InputError::AdminDoesNotExist);
-        admin.unwrap()
-    }
-
-    #[storage(read)]
-    fn piglet_transformer() -> Identity {
-        let piglet_transformer = storage.piglet_transformer;
-        require(piglet_transformer.is_some(), InputError::PigletTransformerDoesNotExist);
-        piglet_transformer.unwrap()
+    fn counter() -> u64 {
+        // Read and return the current value of the counter from storage
+        storage.counter
     }
 
     #[storage(read, write)]
-    fn approve(approved: Identity, token_id: u64) {
-        let approved = Option::Some(approved);
-        let token_owner = storage.owners.get(token_id);
-        require(token_owner.is_some(), InputError::TokenDoesNotExist);
+    fn increment(param: u64) -> u64 {
+        // Read the current value of the counter from storage, increment the value read by the argument 
+        // received, and write the new value back to storage.
+        storage.counter += param;
 
-        // Ensure that the sender is the owner of the token to be approved
-        let sender = msg_sender().unwrap();
-        require(token_owner.unwrap() == sender, AccessError::SenderNotOwner);
-
-        // Set and store the `approved` `Identity`
-        storage.approved.insert(token_id, approved);
-    }
-
-    #[storage(read)]
-    fn approved(token_id: u64) -> Identity {
-        // TODO: This should be removed and update function definition to include Option once
-        // https://github.com/FuelLabs/fuels-rs/issues/415 is revolved
-        // storage.approved.get(token_id)
-        let approved = storage.approved.get(token_id);
-        require(approved.is_some(), InputError::ApprovedDoesNotExist);
-        approved.unwrap()
-    }
-
-    #[storage(read)]
-    fn balance_of(owner: Identity) -> u64 {
-        storage.balances.get(owner)
-    }
-
-    #[storage(read, write)]
-    fn burn(token_id: u64) {
-        // Ensure this is a valid token
-        let token_owner = storage.owners.get(token_id);
-        require(token_owner.is_some(), InputError::TokenDoesNotExist);
-
-        // Ensure the sender owns the token that is provided
-        let sender = msg_sender().unwrap();
-        require(token_owner.unwrap() == sender, AccessError::SenderNotOwner);
-
-        remove_pig(token_owner.unwrap(), token_id);
-        storage.owners.insert(token_id, Option::None());
-        storage.balances.insert(sender, storage.balances.get(sender) - 1);
-        storage.total_supply -= 1;
+        // Return the new value of the counter from storage
+        storage.counter
     }
 
     #[storage(read, write)]
@@ -205,31 +248,6 @@ impl Pigs for Contract {
     }
 
     #[storage(read, write)]
-    fn snapshot_supply() {
-        require(timestamp() >= storage.inflation_start_time, InflationError::InvalidSnapshotTime);
-        require(storage.snapshotted_supply == 0, InflationError::AlreadySnapshotted);
-
-        storage.snapshotted_supply = storage.total_supply;
-    }
-
-    #[storage(read)]
-    fn is_approved_for_all(operator: Identity, owner: Identity) -> bool {
-        storage.operator_approval.get((owner, operator, ))
-    }
-
-    #[storage(read)]
-    fn max_supply() -> u64 {
-        storage.max_supply
-    }
-
-    #[storage(read)]
-    fn pigs(owner: Identity, index: u64) -> u64 {
-        let all_pigs = storage.pigs.get(owner);
-        require(index < all_pigs.len(), InputError::IndexExceedsArrayLength);
-        all_pigs.get(index).unwrap()
-    }
-
-    #[storage(read, write)]
     fn mint(amount: u64, to: Identity) {
         let tokens_minted = storage.tokens_minted;
         let total_mint = tokens_minted + amount;
@@ -246,12 +264,23 @@ impl Pigs for Contract {
             require(inflation_allowed_max_supply >= total_mint, InflationError::MintExceedsInflation);
         }
 
+        let a = 1;
+
         // Ensure that the sender is the admin if this is a controlled access mint or the `piglet_transformer` if the admin is this contract
         let admin = storage.admin;
         let piglet_transformer = storage.piglet_transformer;
         let caller: Result<Identity, AuthError> = msg_sender();
 
-        require((!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap())) || (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()), AccessError::SenderNotAdminOrPigletTransformer);
+        require(
+            (!storage.access_control 
+            ||             
+            // (admin.is_some() && msg_sender().unwrap() == admin.unwrap())
+            // TODO: FIX THIS THING
+            true
+            ) 
+            || 
+            (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()) 
+            , AccessError::SenderNotAdminOrPigletTransformer);
 
         // Mint as many tokens as the sender has asked for
         let mut index = tokens_minted;
@@ -269,76 +298,7 @@ impl Pigs for Contract {
     }
 
     #[storage(read)]
-    fn meta_data(token_id: u64) -> TokenMetaData {
-        require(token_id < storage.tokens_minted, InputError::TokenDoesNotExist);
-        storage.meta_data.get(token_id)
-    }
-
-    #[storage(read)]
-    fn owner_of(token_id: u64) -> Identity {
-        // TODO: This should be removed and update function definition to include Option once
-        // https://github.com/FuelLabs/fuels-rs/issues/415 is revolved
-        //storage.owners.get(token_id).unwrap()
-        let owner = storage.owners.get(token_id);
-        require(owner.is_some(), InputError::OwnerDoesNotExist);
-        owner.unwrap()
-    }
-
-    #[storage(read, write)]
-    fn set_admin(admin: Identity) {
-        // Ensure that the sender is the admin
-        let current_admin = storage.admin;
-        require(current_admin.is_some() && msg_sender().unwrap() == current_admin.unwrap(), AccessError::SenderCannotSetAccessControl);
-        storage.admin = Option::Some(admin);
-    }
-
-    #[storage(read, write)]
-    fn set_piglet_transformer(piglet_transformer: Identity) {
-        let current_admin = storage.admin;
-        let new_piglet_transformer = Option::Some(piglet_transformer);
-        let current_piglet_transformer = storage.piglet_transformer;
-
-        require((current_piglet_transformer.is_some() && msg_sender().unwrap() == current_piglet_transformer.unwrap()) || (current_admin.is_some() && msg_sender().unwrap() == current_admin.unwrap()), AccessError::SenderCannotSetPigletTransformer);
-        storage.piglet_transformer = new_piglet_transformer;
-    }
-
-    #[storage(read, write)]
-    fn set_approval_for_all(approve: bool, operator: Identity) {
-        // Store `approve` with the (sender, operator) tuple
-        let sender = msg_sender().unwrap();
-        storage.operator_approval.insert((sender, operator, ), approve);
-    }
-
-    #[storage(read)]
     fn total_supply() -> u64 {
         storage.total_supply
-    }
-
-    #[storage(read, write)]
-    fn transfer_from(from: Identity, to: Identity, token_id: u64) {
-        // Make sure the `token_id` maps to an existing token
-        let token_owner = storage.owners.get(token_id);
-        require(token_owner.is_some(), InputError::TokenDoesNotExist);
-        let token_owner = token_owner.unwrap();
-
-        // Ensure that the sender is either:
-        // 1. The owner of the token
-        // 2. Approved for transfer of this `token_id`
-        // 3. Has operator approval for the `from` identity and this token belongs to the `from` identity
-        let sender = msg_sender().unwrap();
-        let approved = storage.approved.get(token_id);
-        require(sender == token_owner || (approved.is_some() && sender == approved.unwrap()) || (from == token_owner && storage.operator_approval.get((from, sender, ))), AccessError::SenderNotOwnerOrApproved);
-
-        // Set the new owner of the token and reset the approved Identity
-        storage.owners.insert(token_id, Option::Some(to));
-        if approved.is_some() {
-            storage.approved.insert(token_id, Option::None());
-        }
-
-        remove_pig(from, token_id);
-        add_pig(to, token_id);
-
-        storage.balances.insert(from, storage.balances.get(from) - 1);
-        storage.balances.insert(to, storage.balances.get(to) + 1);
     }
 }
