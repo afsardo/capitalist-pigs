@@ -48,12 +48,12 @@ mod reverts {
     }
 
     #[tokio::test]
-    #[should_panic(expected = "Revert(42)")]
+    #[should_panic()]
     async fn when_token_supply_is_zero() {
         let (deploy_wallet, owner1, _owner2) = setup().await;
 
         let admin = Identity::Address(owner1.wallet.address().into());
-        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 1, 4102444800, 50, 3600).await;
+        constructor(true, &deploy_wallet.contract, &admin, &Identity::ContractId(ContractId::from([2u8; 32])), 0, 4102444800, 50, 3600).await;
     }
 
     #[tokio::test]
