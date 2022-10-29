@@ -2,10 +2,6 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect } from "react";
 
-const Counter = dynamic(() => import("../components/Counter"), {
-  ssr: false,
-});
-
 export default function Home() {
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {

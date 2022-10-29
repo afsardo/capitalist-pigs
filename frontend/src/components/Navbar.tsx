@@ -31,7 +31,7 @@ const routes = [
   },
 ];
 
-export default function Example() {
+export default function Navbar() {
   const router = useRouter();
   const [newKey, setNewKey] = useState("");
   const [key, setKey] = useLocalStorage("key", null);
