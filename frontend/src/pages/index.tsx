@@ -41,7 +41,7 @@ export default function Home() {
                 <Image src="/pig.jpeg" alt="lab" width={200} height={200} />
               </div>
               <p className="font-bold">
-                Adquire a <span className="fancy-text">PIG</span>
+                Acquire a <span className="fancy-text">PIG</span>
               </p>
             </div>
           </div>
@@ -64,7 +64,7 @@ export default function Home() {
               You can now use your mucus to...
             </h5>
             <div className="flex justify-center gap-x-4 mb-8">
-              <div className="rounded-lg bg-green-700 p-4 hide logo-container">
+              <div className="rounded-lg bg-green-700 p-4 hide logo-container hover:scale-125">
                 <Image
                   src="/piglet.png"
                   width={120}
@@ -72,7 +72,7 @@ export default function Home() {
                   alt="piglet"
                 />
               </div>
-              <div className="rounded-lg bg-red-700 p-4 hide logo-container">
+              <div className="rounded-lg bg-red-700 p-4 hide logo-container hover:scale-125">
                 <Image
                   src="/piglet.png"
                   width={120}
@@ -80,7 +80,7 @@ export default function Home() {
                   alt="piglet"
                 />
               </div>
-              <div className="rounded-lg bg-yellow-700 p-4 hide logo-container">
+              <div className="rounded-lg bg-yellow-700 p-4 hide logo-container hover:scale-125">
                 <Image
                   src="/piglet.png"
                   width={120}
@@ -88,7 +88,7 @@ export default function Home() {
                   alt="piglet"
                 />
               </div>
-              <div className="rounded-lg bg-pink-700 p-4 hide logo-container">
+              <div className="rounded-lg bg-pink-700 p-4 hide logo-container hover:scale-125">
                 <Image
                   src="/piglet.png"
                   width={120}
