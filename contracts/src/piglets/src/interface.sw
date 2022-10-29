@@ -54,14 +54,6 @@ abi PigletNFT {
     #[storage(read)]
     fn balance_of(owner: Identity) -> u64;
 
-    /// Claim all available rewards to the `owner` user.
-    ///
-    /// # Arguments
-    ///
-    /// * `owner` - The user of which the balance should be returned.
-    #[storage(read, write)]
-    fn claim_rewards();
-
     /// Burns the specified token.
     ///
     /// When burned, the metadata of the token is removed. After the token has been burned, no one
