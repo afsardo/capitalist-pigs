@@ -20,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="min-h-screen bg-black text-[#F1F7ED] flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="max-w-5xl w-full mx-auto py-4 flex-1 px-4">
           <Component {...pageProps} />
