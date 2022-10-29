@@ -65,16 +65,16 @@ export default function Home() {
             </h5>
             <div className="flex justify-center gap-x-4 mb-8">
               <div className="rounded-lg bg-green-700 p-4 hide">
-                <Image src="/piglet.png" width={120} height={120} />
+                <Image src="/piglet.png" width={120} height={120} alt="piglet" />
               </div>
               <div className="rounded-lg bg-red-700 p-4 delay-200 hide">
-                <Image src="/piglet.png" width={120} height={120} />
+                <Image src="/piglet.png" width={120} height={120} alt="piglet" />
               </div>
               <div className="rounded-lg bg-yellow-700 p-4 delay-500 hide">
-                <Image src="/piglet.png" width={120} height={120} />
+                <Image src="/piglet.png" width={120} height={120} alt="piglet" />
               </div>
               <div className="rounded-lg bg-pink-700 p-4 delay-1000 hide">
-                <Image src="/piglet.png" width={120} height={120} />
+                <Image src="/piglet.png" width={120} height={120} alt="piglet" />
               </div>
             </div>
             <h5 className="animate-bounce font-bold">
