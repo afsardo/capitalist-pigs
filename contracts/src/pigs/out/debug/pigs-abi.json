@@ -1,0 +1,749 @@
+{
+  "types": [
+    {
+      "typeId": 0,
+      "type": "()",
+      "components": [],
+      "typeParameters": null
+    },
+    {
+      "typeId": 1,
+      "type": "b256",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 2,
+      "type": "bool",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 3,
+      "type": "enum AccessError",
+      "components": [
+        {
+          "name": "SenderCannotSetAccessControl",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "SenderNotAdminOrPigletTransformer",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "SenderCannotSetPigletTransformer",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "SenderNotOwner",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "SenderNotOwnerOrApproved",
+          "type": 0,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 4,
+      "type": "enum Identity",
+      "components": [
+        {
+          "name": "Address",
+          "type": 9,
+          "typeArguments": null
+        },
+        {
+          "name": "ContractId",
+          "type": 10,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 5,
+      "type": "enum InflationError",
+      "components": [
+        {
+          "name": "InvalidSnapshotTime",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "AlreadySnapshotted",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "MintExceedsInflation",
+          "type": 0,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 6,
+      "type": "enum InitError",
+      "components": [
+        {
+          "name": "AdminIsNone",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "InvalidInflationStartTime",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "InvalidInflationRate",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "InvalidInflationEpoch",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "CannotReinitialize",
+          "type": 0,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 7,
+      "type": "enum InputError",
+      "components": [
+        {
+          "name": "AdminDoesNotExist",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "IndexExceedsArrayLength",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "PigletTransformerDoesNotExist",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "ApprovedDoesNotExist",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "NotEnoughTokensToMint",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "OwnerDoesNotExist",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "TokenDoesNotExist",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "TokenSupplyCannotBeZero",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "InvalidComissionValue",
+          "type": 0,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 8,
+      "type": "str[7]",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 9,
+      "type": "struct Address",
+      "components": [
+        {
+          "name": "value",
+          "type": 1,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 10,
+      "type": "struct ContractId",
+      "components": [
+        {
+          "name": "value",
+          "type": 1,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 11,
+      "type": "struct TokenMetaData",
+      "components": [
+        {
+          "name": "name",
+          "type": 8,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 12,
+      "type": "u64",
+      "components": null,
+      "typeParameters": null
+    }
+  ],
+  "functions": [
+    {
+      "inputs": [],
+      "name": "admin",
+      "output": {
+        "name": "",
+        "type": 4,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [],
+      "name": "piglet_transformer",
+      "output": {
+        "name": "",
+        "type": 4,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "approved",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "token_id",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "approve",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "token_id",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "approved",
+      "output": {
+        "name": "",
+        "type": 4,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "owner",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "name": "balance_of",
+      "output": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "token_id",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "burn",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "access_control",
+          "type": 2,
+          "typeArguments": null
+        },
+        {
+          "name": "admin",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "piglet_transformer",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "max_supply",
+          "type": 12,
+          "typeArguments": null
+        },
+        {
+          "name": "inflation_start_time",
+          "type": 12,
+          "typeArguments": null
+        },
+        {
+          "name": "inflation_rate",
+          "type": 12,
+          "typeArguments": null
+        },
+        {
+          "name": "inflation_epoch",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "constructor",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [],
+      "name": "snapshot_supply",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "operator",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "owner",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "name": "is_approved_for_all",
+      "output": {
+        "name": "",
+        "type": 2,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [],
+      "name": "max_supply",
+      "output": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "owner",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "index",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "pigs",
+      "output": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": 12,
+          "typeArguments": null
+        },
+        {
+          "name": "to",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "name": "mint",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "token_id",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "meta_data",
+      "output": {
+        "name": "",
+        "type": 11,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "token_id",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "owner_of",
+      "output": {
+        "name": "",
+        "type": 4,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "admin",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "name": "set_admin",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "piglet_transformer",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "name": "set_piglet_transformer",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "approve",
+          "type": 2,
+          "typeArguments": null
+        },
+        {
+          "name": "operator",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "name": "set_approval_for_all",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [],
+      "name": "total_supply",
+      "output": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      }
+    },
+    {
+      "inputs": [
+        {
+          "name": "from",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "to",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "token_id",
+          "type": 12,
+          "typeArguments": null
+        }
+      ],
+      "name": "transfer_from",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      }
+    }
+  ],
+  "loggedTypes": [
+    {
+      "logId": 0,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 1,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 2,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 3,
+      "loggedType": {
+        "name": "",
+        "type": 3,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 4,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 5,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 6,
+      "loggedType": {
+        "name": "",
+        "type": 3,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 7,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 8,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 9,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 10,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 11,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 12,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 13,
+      "loggedType": {
+        "name": "",
+        "type": 5,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 14,
+      "loggedType": {
+        "name": "",
+        "type": 5,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 15,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 16,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 17,
+      "loggedType": {
+        "name": "",
+        "type": 5,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 18,
+      "loggedType": {
+        "name": "",
+        "type": 3,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 19,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 20,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 21,
+      "loggedType": {
+        "name": "",
+        "type": 3,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 22,
+      "loggedType": {
+        "name": "",
+        "type": 3,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 23,
+      "loggedType": {
+        "name": "",
+        "type": 7,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 24,
+      "loggedType": {
+        "name": "",
+        "type": 3,
+        "typeArguments": []
+      }
+    }
+  ]
+}
