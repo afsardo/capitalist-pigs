@@ -39,7 +39,7 @@ const Lab = () => {
             className="uppercase p-4 !bg-orange-700 mt-auto"
             onClick={() => piggletCount >= 5 ? actions.pigletsIntoPig() : null}
           >
-            Mutate
+            Transform 5 Piglets into 1 Pig
           </Button>
         </Card>
       </div>
