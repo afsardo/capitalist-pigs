@@ -8,7 +8,7 @@ dep constants;
 use data_structures::TokenMetaData;
 use errors::{AccessError, InflationError, InitError, InputError};
 use interface::{Pigs};
-use constants::{THOUSAND, YEAR};
+use constants::{THOUSAND, YEAR, FALSE};
 
 use std::{
     block::timestamp,
@@ -255,7 +255,13 @@ impl Pigs for Contract {
         let piglet_transformer = storage.piglet_transformer;
         let caller: Result<Identity, AuthError> = msg_sender();
 
-        require((!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap())) || (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()), AccessError::SenderNotAdminOrPigletTransformer);
+        require(
+            (!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap()))
+             || 
+            (admin.unwrap() == Identity::ContractId(contract_id()) 
+                && piglet_transformer.is_some() 
+                && caller.unwrap() == piglet_transformer.unwrap()
+            ) || FALSE, AccessError::SenderNotAdminOrPigletTransformer);
 
         // Mint as many tokens as the sender has asked for
         let mut index = tokens_minted;
