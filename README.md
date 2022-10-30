@@ -1,5 +1,7 @@
 # CapitalistPigs
 
+Gamify staking for fees in a DeFi project using a set of NFTs.
+
 CapitalistPigs built by Degens, BlazinglyFast™
 
 ## Requirements
