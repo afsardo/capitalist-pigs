@@ -91,8 +91,8 @@ impl BaconDistributor for Contract {
     }
 
     #[storage(read, write)]
-    fn claim_fees(amount: u64) {
+    fn claim_fees(receiver: Identity, amount: u64) {
         only_staking();
-        transfer(amount, storage.bacon, Identity::ContractId(storage.staking.unwrap()));
+        transfer(amount, storage.bacon, receiver);
     }
 }

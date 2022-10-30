@@ -29,9 +29,11 @@ abi Staking {
     fn fee_token() -> ContractId;
 
     /// Returns the address of the fee distributor
-    fn fee_distributor() -> Identity;
+    #[storage(read)]
+    fn fee_distributor() -> ContractId;
 
     /// Returns the address of the Truffes token contract
+    #[storage(read)]
     fn truffles() -> ContractId;
 
     /// Returns the address of the user that has a specific NFT staked
@@ -79,6 +81,15 @@ abi Staking {
     #[storage(read)]
     fn delegated_piglets(delegator: Identity, index: u64) -> u64;
 
+    /// Return a piglet delegated to a specific pig and that is at a specific index in the `delegated_piglets_to_pig.pig` vector
+    ///
+    /// # Arguments
+    ///
+    /// * `pig` - The pig for which we return the delegated piglet
+    /// * `index` - The index we use to return the piglet
+    #[storage(read)]
+    fn delegated_piglets_to_pig(pig: u64, index: u64) -> u64;
+
     /// Returns the pig to which a piglet is delegated
     ///
     /// # Arguments
@@ -115,13 +126,13 @@ abi Staking {
     #[storage(read)]
     fn accrued_pig_fees(pig: u64) -> u64;
 
-    /// Return the accrued and unclaimed fees for a delegated piglet
+    /// Return the accrued and unclaimed fees split across all piglets delegated to a specific pig
     ///
     /// # Arguments
     ///
-    /// * `piglet` - The piglet for which we return the accrued and unclaimed fees
+    /// * `pig` - The pig whose piglets we take into account when calculating fees
     #[storage(read)]
-    fn accrued_piglet_fees(piglet: u64) -> u64;
+    fn accrued_piglet_fees(pig: u64) -> u64;
 
     /// Delegate piglets to a pig
     ///

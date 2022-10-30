@@ -10,6 +10,8 @@ pub enum AccessError {
 
 pub enum InitError {
     AdminIsNone: (),
+    InvalidMaxSupply: (),
+    Uninitialized: (),
     InvalidInflationStartTime: (),
     InvalidInflationRate: (),
     InvalidInflationEpoch: (),

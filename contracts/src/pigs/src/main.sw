@@ -127,6 +127,8 @@ impl Pigs for Contract {
 
     #[storage(read, write)]
     fn approve(approved: Identity, token_id: u64) {
+        require(storage.max_supply > 0, InitError::Uninitialized);
+
         let approved = Option::Some(approved);
         let token_owner = storage.owners.get(token_id);
         require(token_owner.is_some(), InputError::TokenDoesNotExist);
@@ -156,6 +158,8 @@ impl Pigs for Contract {
 
     #[storage(read, write)]
     fn burn(token_id: u64) {
+        require(storage.max_supply > 0, InitError::Uninitialized);
+
         // Ensure this is a valid token
         let token_owner = storage.owners.get(token_id);
         require(token_owner.is_some(), InputError::TokenDoesNotExist);
@@ -187,6 +191,7 @@ impl Pigs for Contract {
         require(inflation_start_time >= timestamp(), InitError::InvalidInflationStartTime);
         require(inflation_rate > 0 && inflation_rate <= THOUSAND, InitError::InvalidInflationRate);
         require(inflation_epoch > 0 && inflation_epoch <= YEAR, InitError::InvalidInflationEpoch);
+        require(max_supply > 0, InitError::InvalidMaxSupply);
 
         let admin = Option::Some(admin);
         let piglet_transformer = Option::Some(piglet_transformer);
@@ -231,6 +236,7 @@ impl Pigs for Contract {
 
     #[storage(read, write)]
     fn mint(amount: u64, to: Identity) {
+        require(storage.max_supply > 0, InitError::Uninitialized);
         let tokens_minted = storage.tokens_minted;
         let total_mint = tokens_minted + amount;
 
@@ -245,8 +251,7 @@ impl Pigs for Contract {
 
         require(storage.max_supply >= total_mint, InputError::NotEnoughTokensToMint);
         if (storage.snapshotted_supply > 0
-            && inflation_allowed_max_supply > 0)
-        {
+            && inflation_allowed_max_supply > 0) {
             require(inflation_allowed_max_supply >= total_mint, InflationError::MintExceedsInflation);
         }
 
@@ -256,12 +261,19 @@ impl Pigs for Contract {
         let caller: Result<Identity, AuthError> = msg_sender();
 
         require(
+<<<<<<< HEAD
             (!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap()))
              || 
             (admin.unwrap() == Identity::ContractId(contract_id()) 
                 && piglet_transformer.is_some() 
                 && caller.unwrap() == piglet_transformer.unwrap()
             ) || FALSE, AccessError::SenderNotAdminOrPigletTransformer);
+=======
+            (!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap())) ||
+            (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()),
+            AccessError::SenderNotAdminOrPigletTransformer
+        );
+>>>>>>> eac9496 (Made fee claims for staking)
 
         // Mint as many tokens as the sender has asked for
         let mut index = tokens_minted;
@@ -326,6 +338,8 @@ impl Pigs for Contract {
 
     #[storage(read, write)]
     fn transfer_from(from: Identity, to: Identity, token_id: u64) {
+        require(storage.max_supply > 0, InitError::Uninitialized);
+
         // Make sure the `token_id` maps to an existing token
         let token_owner = storage.owners.get(token_id);
         require(token_owner.is_some(), InputError::TokenDoesNotExist);

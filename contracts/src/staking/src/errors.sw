@@ -16,11 +16,17 @@ pub enum InputError {
     IndexExceedsArrayLength: (),
     PigletAlreadyDelegated: (),
     PigProvidedNotStaked: (),
+    InvalidComissionValue: (),
     NullArray: (),
     InvalidPig: ()
 }
 
 pub enum AccessControlError {
+    SenderNotPigOwner: (),
     CallerNotPigletOwner: (),
     CallerNotPigletContract: ()
+}
+
+pub enum DelegationError {
+    ExceedsDelegationLimit: ()
 }

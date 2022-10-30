@@ -6,10 +6,14 @@ dep constants;
 
 use errors::*;
 use interface::{Staking};
-use constants::{ZERO, MAX_DELEGATORS};
+use constants::{ZERO, ONE, HUNDRED, MAX_DELEGATED_PIGLETS};
 
 use std::{
-    chain::auth::msg_sender,
+    context::{
+        *,
+        call_frames::*,
+    },
+    chain::auth::*,
     identity::Identity,
     logging::log,
     option::Option,
@@ -28,7 +32,7 @@ storage {
     /// The fee token contract address
     fee_token: Option<ContractId> = Option::None,
     /// The fee distributor contract
-    fee_distributor: Option<Identity> = Option::None,
+    fee_distributor: Option<ContractId> = Option::None,
     /// The address of the truffles token contract
     truffles: Option<ContractId> = Option::None,
     /// The mapping of all pig owners
@@ -43,18 +47,23 @@ storage {
     delegated_piglets: StorageMap<Identity, Vec<u64>> = StorageMap {},
     /// The piglets delegated to each pig
     piglet_to_pig: StorageMap<u64, u64> = StorageMap {},
+    /// All piglets delegated to a pig
+    delegated_piglets_to_pig: StorageMap<u64, Vec<u64>> = StorageMap {},
     /// The commission offered to delegators of a specific pig
     fee_commission: StorageMap<u64, u64> = StorageMap {},
     /// Total amount of fees distributed per second to each staked pig
-    fees_per_second: u64 = 0,
+    fees_per_second: u64 = ZERO,
     /// Amount of new truffles that can be minted each second for a staked pig
-    truffles_per_second: u64 = 0,
+    truffles_per_second: u64 = ZERO,
     /// The last timestamp when a pig staker claimed fees
     last_pig_fee_claim: StorageMap<u64, u64> = StorageMap {},
     /// The last timestamp when a pig staker minted accrued truffles
     last_pig_truffle_mint: StorageMap<u64, u64> = StorageMap {},
 }
 
+//////////////////
+// Data Structures
+//////////////////
 pub struct TokenMetaData {
     // This is left as an example. Support for dynamic length string is needed here
     name: str[7],
@@ -229,20 +238,68 @@ abi BaconDistributor {
     fn constructor(bacon: ContractId, staking: ContractId);
 
     #[storage(read, write)]
-    fn claim_fees(amount: u64);
+    fn claim_fees(receiver: Identity, amount: u64);
 }
 
 ///////////////////
 // Internal Methods
 ///////////////////
-/// Claim fees for the pig staker and users who delegated piglets to the target pig
-#[storage(read, write)]
-fn _claim_fees(pig: u64) {
+/// Calculate and return the accrued fees for a staked pig
+#[storage(read)]
+fn _accrued_pig_fees(pig: u64) -> u64 {
+    let pigs_contract = abi(Pigs, storage.pigs.unwrap().into());
+    require(
+        storage.pig_owner.get(pig) != Identity::ContractId(~ContractId::from(ZERO_B256)) &&
+        storage.pig_owner.get(pig) != Identity::Address(~Address::from(ZERO_B256)) &&
+        pigs_contract.owner_of(pig) == Identity::ContractId(contract_id()),
+        InputError::PigProvidedNotStaked
+    );
 
+    let last_pig_fee_claim: u64 = storage.last_pig_fee_claim.get(pig);
+    if (pig == ZERO || storage.fees_per_second == ZERO || last_pig_fee_claim == timestamp() || last_pig_fee_claim == ZERO) {
+        ZERO
+    } else {
+        let remaining_fee_for_staker: u64 = HUNDRED - storage.fee_commission.get(pig);
+        ((timestamp() - last_pig_fee_claim) * storage.fees_per_second * (storage.staking_power.get(pig) + ONE)) * remaining_fee_for_staker / HUNDRED
+    }
 }
 
+/// Calculate and return the accrued fees for a delegated piglet
+#[storage(read)]
+fn _accrued_piglet_fees(pig: u64) -> u64 {
+    let pig_fees: u64 = _accrued_pig_fees(pig);
+    if (pig_fees == ZERO) {
+        ZERO
+    } else {
+        let all_fees: u64 = ((timestamp() - storage.last_pig_fee_claim.get(pig)) * storage.fees_per_second * (storage.staking_power.get(pig) + ONE));
+        all_fees - pig_fees
+    }
+}
 
+/// Calculate and return the accrued fees for a delegated piglet using precalculated pig fees
+#[storage(read)]
+fn _accrued_piglet_fees_using_pig_fees(pig: u64, pig_fees: u64) -> u64 {
+    if (pig_fees == ZERO) {
+        ZERO
+    } else {
+        let all_fees: u64 = ((timestamp() - storage.last_pig_fee_claim.get(pig)) * storage.fees_per_second * (storage.staking_power.get(pig) + ONE));
+        all_fees - pig_fees
+    }
+}
 
+/// Claim fees for the pig staker and users who delegated piglets to the staked pig
+#[storage(read, write)]
+fn _claim_fees(pig: u64) {
+    let pig_staker_fees: u64         = _accrued_pig_fees(pig);
+
+    if (pig_staker_fees > ZERO) {
+        let fee_distributor_contract = abi(BaconDistributor, storage.fee_distributor.unwrap().into());
+        fee_distributor_contract.claim_fees(storage.pig_owner.get(pig), pig_staker_fees);
+
+        let total_piglet_fees: u64 = _accrued_piglet_fees_using_pig_fees(pig, pig_staker_fees);
+
+    }
+}
 
 impl Staking for Contract {
     #[storage(read, write)]
@@ -253,8 +310,8 @@ impl Staking for Contract {
         require(fee_token != BASE_ASSET_ID, InitError::FeeTokenIsNone);
         require(fee_distributor != BASE_ASSET_ID, InitError::FeeDistributorIsNone);
         require(truffles != BASE_ASSET_ID, InitError::TrufflesIsNone);
-        require(fees_per_second > 0, InitError::InvalidFeesPerSecond);
-        require(truffles_per_second > 0, InitError::InvalidTrufflesPerSecond);
+        require(fees_per_second > ZERO, InitError::InvalidFeesPerSecond);
+        require(truffles_per_second > ZERO, InitError::InvalidTrufflesPerSecond);
 
         storage.pigs                = Option::Some(pigs);
         storage.piglets             = Option::Some(piglets);
@@ -280,10 +337,12 @@ impl Staking for Contract {
         storage.fee_token.unwrap()
     }
 
-    fn fee_distributor() -> Identity {
+    #[storage(read)]
+    fn fee_distributor() -> ContractId {
         storage.fee_distributor.unwrap()
     }
 
+    #[storage(read)]
     fn truffles() -> ContractId {
         storage.truffles.unwrap()
     }
@@ -297,7 +356,7 @@ impl Staking for Contract {
     fn staked_pigs(user: Identity, index: u64) -> u64 {
         let all_pigs = storage.staked_pigs.get(user);
         require(index < all_pigs.len(), InputError::IndexExceedsArrayLength);
-        all_pigs.get(index)
+        all_pigs.get(index).unwrap()
     }
 
     #[storage(read)]
@@ -314,6 +373,13 @@ impl Staking for Contract {
     #[storage(read)]
     fn delegated_piglets(delegator: Identity, index: u64) -> u64 {
         let all_piglets = storage.delegated_piglets.get(delegator);
+        require(index < all_piglets.len(), InputError::IndexExceedsArrayLength);
+        all_piglets.get(index).unwrap()
+    }
+
+    #[storage(read)]
+    fn delegated_piglets_to_pig(pig: u64, index: u64) -> u64 {
+        let all_piglets = storage.delegated_piglets_to_pig.get(pig);
         require(index < all_piglets.len(), InputError::IndexExceedsArrayLength);
         all_piglets.get(index).unwrap()
     }
@@ -340,33 +406,44 @@ impl Staking for Contract {
 
     #[storage(read)]
     fn accrued_truffles(pig: u64) -> u64 {
-        //temp 
-        return 1
+        let pigs_contract = abi(Pigs, storage.pigs.unwrap().into());
+        require(
+            storage.pig_owner.get(pig) != Identity::ContractId(~ContractId::from(ZERO_B256)) &&
+            storage.pig_owner.get(pig) != Identity::Address(~Address::from(ZERO_B256)) &&
+            pigs_contract.owner_of(pig) == Identity::ContractId(contract_id()),
+            InputError::PigProvidedNotStaked
+        );
+
+        let last_pig_truffle_mint: u64 = storage.last_pig_truffle_mint.get(pig);
+        if (pig == ZERO || storage.truffles_per_second == ZERO || last_pig_truffle_mint == timestamp() || last_pig_truffle_mint == ZERO) {
+            ZERO
+        } else {
+            (timestamp() - last_pig_truffle_mint) * storage.truffles_per_second
+        }
     }
 
     #[storage(read)]
     fn accrued_pig_fees(pig: u64) -> u64 {
-        //temp 
-        return 1
+        _accrued_pig_fees(pig)
     }
 
     #[storage(read)]
-    fn accrued_piglet_fees(piglet: u64) -> u64{
-        //temp 
-        return 1
+    fn accrued_piglet_fees(pig: u64) -> u64 {
+        _accrued_piglet_fees(pig)
     }
 
     #[storage(read, write)]
     fn delegate(delegator: Identity, pig: u64, piglets: Vec<u64>) {
         let caller: Identity = msg_sender().unwrap();
-        
+
         require(pig > ZERO, InputError::InvalidPig);
         require(piglets.len() > ZERO, InputError::NullArray);
         require(delegator != Identity::ContractId(contract_id()), InputError::CannotAssingToThisContract);
         require(caller == Identity::ContractId(storage.piglets.unwrap()), AccessControlError::CallerNotPigletContract);
+        require(storage.delegated_piglets_to_pig.get(pig).len() < MAX_DELEGATED_PIGLETS, DelegationError::ExceedsDelegationLimit);
 
         // Check if the target pig is in this contract
-        let pigs_contract = abi(Pigs, storage.pig.unwrap().into());
+        let pigs_contract = abi(Pigs, storage.pigs.unwrap().into());
         let piglet_contract = abi(Piglet, storage.piglets.unwrap().into());
         require(
             storage.pig_owner.get(pig) != Identity::ContractId(~ContractId::from(ZERO_B256)) &&
@@ -378,17 +455,18 @@ impl Staking for Contract {
         _claim_fees(pig);
         storage.staking_power.insert(pig, storage.staking_power.get(pig) + piglets.len());
 
-        let mut i: u64 = 0;
+        let mut i: u64 = ZERO;
         while (i < piglets.len()) {
             require(piglet_contract.owner_of(piglets.get(i).unwrap()) != Identity::ContractId(contract_id()), InputError::PigletAlreadyDelegated);
 
             storage.piglet_owner.insert(piglets.get(i).unwrap(), delegator);
             storage.delegated_piglets.get(delegator).push(piglets.get(i).unwrap());
             storage.piglet_to_pig.insert(piglets.get(i).unwrap(), pig);
+            storage.delegated_piglets_to_pig.get(pig).push(piglets.get(i).unwrap());
 
-            piglet_contract.transfer_from(msg_sender().unwrap(), Identity::ContractId(~ContractId::from(contract_id())), piglets.get(i).unwrap());
+            piglet_contract.transfer_from(delegator, Identity::ContractId(contract_id()), piglets.get(i).unwrap());
 
-            i += 1;
+            i += ONE;
         }
     }
 
@@ -400,8 +478,8 @@ impl Staking for Contract {
         require(piglets.len() > ZERO, InputError::NullArray);
         require(caller == Identity::ContractId(storage.piglets.unwrap()), AccessControlError::CallerNotPigletContract);
 
-        let mut i: u64           = 0;
-        let mut j: u64           = 0;
+        let mut i: u64       = ZERO;
+        let mut j: u64       = ZERO;
         let caller: Identity = msg_sender().unwrap();
         let piglet_contract  = abi(Piglet, storage.piglets.unwrap().into());
 
@@ -412,14 +490,30 @@ impl Staking for Contract {
             require(storage.piglet_owner.get(piglets.get(i).unwrap()) == delegator, AccessControlError::CallerNotPigletOwner);
 
             storage.piglet_to_pig.insert(piglets.get(i).unwrap(), ZERO);
-            while (j < storage.delegated_piglets.get(storage.piglet_owner.get(piglets.get(i).unwrap()))) {
-                j += 1;
+
+            let delegated_piglets = storage.delegated_piglets.get(storage.piglet_owner.get(piglets.get(i).unwrap()));
+            while (j < delegated_piglets.len()) {
+                if (delegated_piglets.get(j).unwrap() == piglets.get(i).unwrap()) {
+                    storage.delegated_piglets.get(storage.piglet_owner.get(piglets.get(i).unwrap())).remove(j);
+                    break;
+                }
+                j += ONE;
             }
 
-            piglet_contract.transfer_from(Identity::ContractId(~ContractId::from(contract_id())), delegator, piglets.get(i).unwrap());
+            j = ZERO;
+            let delegated_piglets_to_pig = storage.delegated_piglets_to_pig.get(pig);
+            while (j < delegated_piglets_to_pig.len()) {
+                if (delegated_piglets_to_pig.get(j).unwrap() == piglets.get(i).unwrap()) {
+                    storage.delegated_piglets_to_pig.get(pig).remove(j);
+                    break;
+                }
+                j += ONE;
+            }
 
-            j = 0;
-            i += 1;
+            piglet_contract.transfer_from(Identity::ContractId(contract_id()), delegator, piglets.get(i).unwrap());
+
+            j = ZERO;
+            i += ONE;
         }
     }
 
@@ -442,9 +536,9 @@ impl Staking for Contract {
     fn set_fee_commission(pig: u64, commission: u64) {
         let caller: Identity = msg_sender().unwrap();
 
-        require(storage.pig_owner.get(pig) == caller, AccessError::SenderNotOwner);
-        require(commission <= 100, InputError::InvalidComissionValue)
-        
+        require(storage.pig_owner.get(pig) == caller, AccessControlError::SenderNotPigOwner);
+        require(commission < HUNDRED, InputError::InvalidComissionValue);
+
         storage.fee_commission.insert(pig, commission);
     }
 }

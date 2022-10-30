@@ -8,7 +8,6 @@ pub struct Metadata {
 }
 
 pub mod abi_calls {
-
     use super::*;
 
     pub async fn admin(contract: &Pigs) -> Identity {

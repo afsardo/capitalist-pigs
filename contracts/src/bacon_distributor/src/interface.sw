@@ -12,5 +12,5 @@ abi BaconDistributor {
 
     /// Claim bacon (callable only by the staking contract)
     #[storage(read, write)]
-    fn claim_fees(amount: u64);
+    fn claim_fees(receiver: Identity, amount: u64);
 }
