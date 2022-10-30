@@ -28,7 +28,7 @@ const Lab = () => {
             className="uppercase p-4 mt-auto"
             onClick={() => trufflesCount >= 10 ? actions.trufflesIntoPiglet() : null}
           >
-            Swap
+            Get me some Piglets!
           </Button>
         </Card>
         <Card className="flex flex-col w-full gap-4">
