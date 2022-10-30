@@ -14,14 +14,14 @@ const Coop = () => {
   const actions = useAllOutLifeStore((s) => s.actions);
 
   const onStake = () => {
-    if (selectedPig) {
+    if (selectedPig != null) {
       actions.stakePig(selectedPig);
       setSelectedPig(null);
     }
   };
 
   const onDelegate = () => {
-    if (selectedPigglet) {
+    if (selectedPigglet != null) {
       actions.delegatePigglet(selectedPigglet);
       setSelectedPigglet(null);
     }
