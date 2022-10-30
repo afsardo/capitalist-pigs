@@ -1,12 +1,15 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect } from "react";
+import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 
 const MintButton = dynamic(() => import("../components/MintButton"), {
   ssr: false,
 });
 
 export default function Home() {
+  const actions = useAllOutLifeStore((s) => s.actions);
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -101,7 +104,12 @@ export default function Home() {
             <p className="text-white/70 mb-8 text-lg">
               Stop being a peasant today... be a part of the Capitalist Pigs
             </p>
-            <MintButton />
+            <button
+              className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest animate-bounce"
+              onClick={() => actions.mintPig()}
+            >
+              CLAIM
+            </button>
           </div>
         </section>
       </main>
