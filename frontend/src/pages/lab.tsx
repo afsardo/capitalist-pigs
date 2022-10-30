@@ -2,8 +2,12 @@ import React from "react";
 
 import Button from "src/components/Button";
 import Card from "src/components/Card";
+import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
+
 
 const Lab = () => {
+  const actions = useAllOutLifeStore((s) => s.actions);
+  const piggletCount = useAllOutLifeStore((s) => s.piggletCount);
   return (
     <>
       <div className="flex flex-col md:flex-row justify-center gap-4 mt-[60px]">
@@ -33,7 +37,7 @@ const Lab = () => {
           </p>
           <Button
             className="uppercase p-4 !bg-orange-700 mt-auto"
-            onClick={() => alert("TODO: DELEGATE")}
+            onClick={() => piggletCount >= 5 ? actions.pigletsIntoPig() : null}
           >
             Mutate
           </Button>
