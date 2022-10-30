@@ -4,9 +4,9 @@ import Button from "src/components/Button";
 import Card from "src/components/Card";
 import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 
-
 const Lab = () => {
   const actions = useAllOutLifeStore((s) => s.actions);
+  const delegatedPigglets = useAllOutLifeStore((s) => s.delegatedPigglets);
   const piggletCount = useAllOutLifeStore((s) => s.piggletCount);
   const trufflesCount = useAllOutLifeStore((s) => s.truffleCount);
   return (
@@ -21,12 +21,13 @@ const Lab = () => {
         <Card className="flex flex-col w-full gap-4">
           <h6>Truffles</h6>
           <p className="text-white/50">
-            Merchant is interested in swaping some tasteful
-            truffles for piglets
+            Merchant is interested in swaping some tasteful truffles for piglets
           </p>
           <Button
             className="uppercase p-4 mt-auto"
-            onClick={() => trufflesCount >= 10 ? actions.trufflesIntoPiglet() : null}
+            onClick={() =>
+              trufflesCount >= 100 ? actions.trufflesIntoPiglet() : null
+            }
           >
             Get me some Piglets!
           </Button>
@@ -38,7 +39,11 @@ const Lab = () => {
           </p>
           <Button
             className="uppercase p-4 !bg-orange-700 mt-auto"
-            onClick={() => piggletCount >= 5 ? actions.pigletsIntoPig() : null}
+            onClick={() =>
+              piggletCount - delegatedPigglets.length >= 5
+                ? actions.pigletsIntoPig()
+                : null
+            }
           >
             Transform 5 Piglets into 1 Pig
           </Button>

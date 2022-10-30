@@ -4,12 +4,31 @@ import dynamic from "next/dynamic";
 import Footer from "src/components/Footer";
 
 import "../styles/globals.css";
+import { useEffect } from "react";
+import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 
 const Navbar = dynamic(() => import("../components/Navbar"), {
   ssr: false,
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const stakedPigs = useAllOutLifeStore((s) => s.stakedPigs);
+  const actions = useAllOutLifeStore((s) => s.actions);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const stakedAmount = stakedPigs.length;
+      if (stakedAmount > 0) {
+        actions.mintTruffles(stakedAmount);
+        actions.mintBacon(stakedAmount);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [stakedPigs, actions]);
+
   return (
     <>
       <Head>

@@ -9,7 +9,7 @@ const WALLET_SECRET =
 // The ID of the contract deployed to our local node.
 // The contract ID is displayed when the `forc deploy` command is run.
 const PIGS_CONTRACT_ID =
-  "0xbef3f0ff5d1fe6ecb15137d4302d23a09e66dbc4e6483e0075b2767b41f2de9f";
+  "0x597f725c0cd2e1b83e24e324bc37363f0c6bb2a8daf4bd38fb55fcee60c4e479";
 
 const PIGLETS_CONTRACT_ID =
   "0xa344e8a89e0395899301a8d00eda5fe09e992d350d99b4b5af6e3dfdfac7d0ad";

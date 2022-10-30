@@ -2,6 +2,8 @@ import React from "react";
 import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 
 const Footer = () => {
+  const stakedPigs = useAllOutLifeStore((s) => s.stakedPigs);
+  const delegatedPigglets = useAllOutLifeStore((s) => s.delegatedPigglets);
   const pigCount = useAllOutLifeStore((s) => s.pigCount);
   const piggletCount = useAllOutLifeStore((s) => s.piggletCount);
   const truffleCount = useAllOutLifeStore((s) => s.truffleCount);
@@ -13,10 +15,14 @@ const Footer = () => {
         © {new Date().getFullYear()} Powered by Degens, BlazinglyFast
       </div>
       <div className="flex space-x-5">
-        <div>{pigCount} 🐖</div>
-        <div>{piggletCount} 🐷</div>
-        <div>{truffleCount} 🌰</div>
-        <div>{baconCount} 🥓</div>
+        <div>
+          {pigCount - stakedPigs.length} / {pigCount} 🐖
+        </div>
+        <div>
+          {piggletCount - delegatedPigglets.length} / {piggletCount} 🐷
+        </div>
+        <div>{truffleCount.toFixed(2)} 🌰</div>
+        <div>{baconCount.toFixed(2)} 🥓</div>
       </div>
     </footer>
   );
