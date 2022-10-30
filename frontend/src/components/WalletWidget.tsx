@@ -4,6 +4,7 @@ import { formatWalletAddress } from "src/utils";
 import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 import Button from "./Button";
 import Modal from "./Modal";
+import { ClipboardIcon } from "@heroicons/react/24/solid";
 
 const WalletWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +27,13 @@ const WalletWidget = () => {
     }
   };
 
+  const copyClipboard = (text: string) => {
+    if (navigator) {
+      navigator.clipboard.writeText(text);
+      alert("Copied!");
+    }
+  };
+
   return (
     <>
       <button
@@ -37,7 +45,13 @@ const WalletWidget = () => {
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Wallet">
         <div className="flex mb-8 gap-2 text-black">
           {privateKey ? (
-            <div>Private key: {formatWalletAddress(privateKey)}</div>
+            <div className="flex items-center gap-4">
+              Private key: {formatWalletAddress(privateKey)}
+              <ClipboardIcon
+                className="w-5 h-5 inline-block cursor-pointer"
+                onClick={() => copyClipboard(privateKey)}
+              />
+            </div>
           ) : (
             <>
               <input
