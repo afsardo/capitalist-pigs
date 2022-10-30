@@ -37,7 +37,7 @@ export default function DashboardPage() {
         // Fetch all pigs
       }
     }
-    getPigs();
+    // getPigs();
   }, []);
 
   const pigs = [];
