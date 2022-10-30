@@ -1,5 +1,10 @@
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect } from "react";
+
+const MintButton = dynamic(() => import("../components/MintButton"), {
+  ssr: false,
+});
 
 export default function Home() {
   useEffect(() => {
@@ -96,9 +101,7 @@ export default function Home() {
             <p className="text-white/70 mb-8 text-lg">
               Stop being a peasant today... be a part of the Capitalist Pigs
             </p>
-            <button className="bg-purple-700 hover:bg-purple-900 p-4 rounded-xl w-48 font-semibold tracking-widest animate-bounce">
-              CLAIM
-            </button>
+            <MintButton />
           </div>
         </section>
       </main>
