@@ -54,9 +54,9 @@ const WalletWidget = () => {
               <input
                 ref={inputRef}
                 placeholder="Private Key"
-                className="px-2"
+                className="px-2 beautiful-input-button"
               />
-              <button className="bg-white text-black px-2" onClick={submit}>
+              <button className="bg-white text-black px-2 beautiful-input-button" onClick={submit}>
                 Submit
               </button>
             </>
