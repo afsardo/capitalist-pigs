@@ -14,7 +14,6 @@ use staking_interface::{StakingABI};
 use data_structures::TokenMetaData;
 use errors::{AccessError, InitError, InputError};
 
-
 use std::{
     chain::auth::msg_sender,
     constants::{
