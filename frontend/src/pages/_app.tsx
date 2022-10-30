@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import Footer from "src/components/Footer";
 
 import "../styles/globals.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 
 const Navbar = dynamic(() => import("../components/Navbar"), {
@@ -12,6 +12,8 @@ const Navbar = dynamic(() => import("../components/Navbar"), {
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [isHydrated, setIsHydrated] = useState(false);
+
   const stakedPigs = useAllOutLifeStore((s) => s.stakedPigs);
   const actions = useAllOutLifeStore((s) => s.actions);
 
@@ -29,6 +31,10 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, [stakedPigs, actions]);
 
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   return (
     <>
       <Head>
@@ -40,11 +46,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="min-h-screen flex flex-col">
-        <Navbar />
+        {isHydrated && <Navbar />}
         <div className="max-w-5xl w-full mx-auto py-4 flex-1 px-4">
           <Component {...pageProps} />
         </div>
-        <Footer />
+        {isHydrated && <Footer />}
       </div>
     </>
   );
