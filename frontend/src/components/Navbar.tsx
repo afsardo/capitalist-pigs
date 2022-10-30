@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import useLocalStorage from "../hooks/useLocalStorage";
 import { Disclosure } from "@headlessui/react";
 import { Wallet } from "fuels";
 import {
@@ -15,25 +14,25 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Modal from "./Modal";
 import Button from "./Button";
 import { formatWalletAddress } from "src/utils";
+import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 
 const WalletWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [walletAddress, setWalletAddress] = useLocalStorage<null | string>(
-    "key",
-    null
-  );
+
+  const privateKey = useAllOutLifeStore((s) => s.privateKey);
+  const setPrivateKey = useAllOutLifeStore((s) => s.actions.setPrivateKey);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const generateWallet = async () => {
     const res = await Wallet.generate();
-    setWalletAddress(res.privateKey);
+    setPrivateKey(res.privateKey);
     setIsOpen(false);
   };
 
   const submit = () => {
     if (inputRef.current) {
-      setWalletAddress(inputRef.current.value);
+      setPrivateKey(inputRef.current.value);
       setIsOpen(false);
     }
   };
@@ -44,12 +43,12 @@ const WalletWidget = () => {
         onClick={() => setIsOpen(true)}
         className="text-ellipsis overflow-hidden w-[200px] border border-yellow-400 px-3 py-1 rounded-full"
       >
-        {walletAddress ? formatWalletAddress(walletAddress) : "Connect"}
+        {privateKey ? formatWalletAddress(privateKey) : "Connect"}
       </button>
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Wallet">
         <div className="flex mb-8 gap-2 text-black">
-          {walletAddress ? (
-            <div>Private key: {formatWalletAddress(walletAddress)}</div>
+          {privateKey ? (
+            <div>Private key: {formatWalletAddress(privateKey)}</div>
           ) : (
             <>
               <input
@@ -72,12 +71,12 @@ const WalletWidget = () => {
           </Button>
           <Button
             className={`rounded-full py-2 text-sm ${
-              walletAddress === ""
+              privateKey === ""
                 ? "opacity-30 cursor-auto pointer-events-none"
                 : ""
             }`}
             onClick={() => {
-              setWalletAddress("");
+              setPrivateKey("");
               setIsOpen(false);
             }}
           >
