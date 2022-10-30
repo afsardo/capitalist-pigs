@@ -296,8 +296,24 @@ fn _claim_fees(pig: u64) {
         let fee_distributor_contract = abi(BaconDistributor, storage.fee_distributor.unwrap().into());
         fee_distributor_contract.claim_fees(storage.pig_owner.get(pig), pig_staker_fees);
 
-        let total_piglet_fees: u64 = _accrued_piglet_fees_using_pig_fees(pig, pig_staker_fees);
+        let mut j: u64                 = 0;
+        let mut total_piglet_fees: u64 = _accrued_piglet_fees_using_pig_fees(pig, pig_staker_fees);
+        let delegated_piglets_to_pig   = storage.delegated_piglets_to_pig.get(pig);
+        let fee_per_piglet: u64        = total_piglet_fees / delegated_piglets_to_pig.len();
 
+        while (j < delegated_piglets_to_pig.len()) {
+            if (j == delegated_piglets_to_pig.len() - 1) {
+                fee_distributor_contract.claim_fees(storage.piglet_owner.get(delegated_piglets_to_pig.get(j).unwrap()), total_piglet_fees);
+            } else {
+                if (fee_per_piglet > 0) {
+                  fee_distributor_contract.claim_fees(storage.piglet_owner.get(delegated_piglets_to_pig.get(j).unwrap()), fee_per_piglet);
+                }
+
+                total_piglet_fees -= fee_per_piglet;
+            }
+
+            j += 1;
+        }
     }
 }
 

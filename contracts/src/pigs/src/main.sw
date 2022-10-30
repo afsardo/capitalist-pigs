@@ -261,19 +261,12 @@ impl Pigs for Contract {
         let caller: Result<Identity, AuthError> = msg_sender();
 
         require(
-<<<<<<< HEAD
             (!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap()))
-             || 
-            (admin.unwrap() == Identity::ContractId(contract_id()) 
-                && piglet_transformer.is_some() 
+             ||
+            (admin.unwrap() == Identity::ContractId(contract_id())
+                && piglet_transformer.is_some()
                 && caller.unwrap() == piglet_transformer.unwrap()
             ) || FALSE, AccessError::SenderNotAdminOrPigletTransformer);
-=======
-            (!storage.access_control || (admin.is_some() && msg_sender().unwrap() == admin.unwrap())) ||
-            (admin.unwrap() == Identity::ContractId(contract_id()) && piglet_transformer.is_some() && caller.unwrap() == piglet_transformer.unwrap()),
-            AccessError::SenderNotAdminOrPigletTransformer
-        );
->>>>>>> eac9496 (Made fee claims for staking)
 
         // Mint as many tokens as the sender has asked for
         let mut index = tokens_minted;
