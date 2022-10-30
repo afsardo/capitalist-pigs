@@ -10,6 +10,7 @@ interface State {
   actions: {
     mintPig: () => void;
     pigletsIntoPig: () => void;
+    trufflesIntoPiglet: () => void;
     setPrivateKey: (key: string) => void;
   };
 }
@@ -25,12 +26,19 @@ export const useAllOutLifeStore = create<State>()(
       actions: {
         mintPig: () => set((state) => ({ pigCount: state.pigCount + 1 })),
         pigletsIntoPig: () =>
-            set((state) => (
-              { 
-                pigCount: state.pigCount + 1,
-                piggletCount: state.piggletCount - 5
-              }
-            )),
+          set((state) => (
+            { 
+              pigCount: state.pigCount + 1,
+              piggletCount: state.piggletCount - 5
+            }
+          )),
+        trufflesIntoPiglet: () =>
+          set((state) => (
+            { 
+              piggletCount: state.piggletCount + 1,
+              truffleCount: state.truffleCount - 10
+            }
+          )),
         setPrivateKey: (key: string) => set(() => ({ privateKey: key })),
       },
       //   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),

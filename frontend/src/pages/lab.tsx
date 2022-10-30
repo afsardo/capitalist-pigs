@@ -8,6 +8,7 @@ import { useAllOutLifeStore } from "stores/useAllOutLifeStore";
 const Lab = () => {
   const actions = useAllOutLifeStore((s) => s.actions);
   const piggletCount = useAllOutLifeStore((s) => s.piggletCount);
+  const trufflesCount = useAllOutLifeStore((s) => s.truffleCount);
   return (
     <>
       <div className="flex flex-col md:flex-row justify-center gap-4 mt-[60px]">
@@ -20,12 +21,12 @@ const Lab = () => {
         <Card className="flex flex-col w-full gap-4">
           <h6>Truffles</h6>
           <p className="text-white/50">
-            Merchant is interested in swaping a smart pig for some tasteful
-            truffles
+            Merchant is interested in swaping some tasteful
+            truffles for piglets
           </p>
           <Button
             className="uppercase p-4 mt-auto"
-            onClick={() => alert("TODO: STAKE")}
+            onClick={() => trufflesCount >= 10 ? actions.trufflesIntoPiglet() : null}
           >
             Swap
           </Button>
