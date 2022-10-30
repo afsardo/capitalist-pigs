@@ -57,10 +57,10 @@ const WalletWidget = () => {
               <input
                 ref={inputRef}
                 placeholder="Private Key"
-                className="px-2 beautiful-input-button"
+                className="p-2 rounded-lg flex-1"
               />
               <button
-                className="bg-white text-black px-2 beautiful-input-button"
+                className="bg-white text-black p-2 rounded-lg hover:bg-white/80"
                 onClick={submit}
               >
                 Submit

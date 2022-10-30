@@ -42,17 +42,3 @@ body {
 .logo-container:nth-child(4) {
   @apply delay-1000;
 }
-
-.beautiful-input-button {
-  border-radius: 5px;
-  padding: 10px;
-  width: 100%;
-}
-
-.gg {
-  font-size: 20px;
-}
-
-.text-gg {
-  font-size: 12px;
-}
